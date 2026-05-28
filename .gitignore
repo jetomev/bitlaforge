@@ -1,0 +1,12 @@
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+.venv/
+build/
+dist/
+.pytest_cache/
+
+# Local minerd output / scratch
+*.log
+*.pid

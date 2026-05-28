@@ -1,0 +1,270 @@
+/*
+ * BitlaForge — Catppuccin Mocha Theme
+ * Textual TUI stylesheet (Forge-suite styling — consistent with
+ * grubForge and alacrittyForge).
+ *
+ * Palette:
+ *   Base:     #1e1e2e   Mantle:   #181825   Crust:    #11111b
+ *   Surface0: #313244   Surface1: #45475a   Surface2: #585b70
+ *   Overlay0: #6c7086   Text:     #cdd6f4
+ *   Blue:     #89b4fa   Green:    #a6e3a1   Yellow:   #f9e2af
+ *   Red:      #f38ba8   Mauve:    #cba6f7   Pink:     #f5c2e7
+ */
+
+/* ── Root ─────────────────────────────────────────────────────────────── */
+
+Screen {
+    background: #1e1e2e;
+    color: #cdd6f4;
+}
+
+Header {
+    background: #11111b;
+    color: #cba6f7;
+}
+
+Footer {
+    background: #11111b;
+    color: #585b70;
+}
+
+/* ── Sidebar ──────────────────────────────────────────────────────────── */
+
+.sidebar {
+    background: #181825;
+    border-right: solid #313244;
+    width: 26;
+    height: 100%;
+    layout: vertical;
+}
+
+.sidebar-title {
+    background: #11111b;
+    color: #89b4fa;
+    text-align: center;
+    text-style: bold;
+    padding: 1 0 0 0;
+    height: 2;
+}
+
+.sidebar-subtitle {
+    background: #11111b;
+    color: #6c7086;
+    text-align: center;
+    padding: 0 0 1 0;
+    height: 2;
+    border-bottom: solid #313244;
+}
+
+.nav-item {
+    padding: 1 2;
+    height: 3;
+    color: #a6adc8;
+    background: #181825;
+}
+
+.nav-item:hover {
+    background: #313244;
+    color: #cdd6f4;
+}
+
+.nav-item.--active {
+    background: #313244;
+    color: #89b4fa;
+    border-left: thick #cba6f7;
+    text-style: bold;
+}
+
+.sidebar-spacer {
+    height: 1fr;
+}
+
+.sidebar-footer {
+    background: #11111b;
+    color: #585b70;
+    padding: 0 2;
+    height: 3;
+    border-top: solid #313244;
+}
+
+/* ── Main content area ────────────────────────────────────────────────── */
+
+ContentSwitcher {
+    background: #1e1e2e;
+    width: 1fr;
+    height: 100%;
+}
+
+.main-area {
+    padding: 1 2;
+    background: #1e1e2e;
+    height: 100%;
+    layout: vertical;
+}
+
+.section-title {
+    color: #cba6f7;
+    text-style: bold;
+    margin-bottom: 1;
+}
+
+.detail-muted {
+    color: #a6adc8;
+    margin-bottom: 1;
+}
+
+.field-label {
+    color: #89b4fa;
+    margin-top: 1;
+}
+
+/* ── Dashboard ────────────────────────────────────────────────────────── */
+
+#dashboard-content {
+    color: #cdd6f4;
+    height: auto;
+}
+
+/* ── Log screen ───────────────────────────────────────────────────────── */
+
+.log-controls {
+    layout: horizontal;
+    height: 3;
+    margin-bottom: 1;
+}
+
+#log-search {
+    width: 1fr;
+    margin-right: 1;
+}
+
+#log-autoscroll {
+    width: 18;
+}
+
+#log-view-container {
+    background: #181825;
+    border: solid #313244;
+    padding: 0 1;
+    height: 1fr;
+}
+
+#log-view {
+    background: #181825;
+    color: #cdd6f4;
+    height: auto;
+}
+
+#log-status {
+    background: #11111b;
+    color: #cdd6f4;
+    padding: 0 2;
+    height: 1;
+    border-top: solid #313244;
+}
+
+/* ── Config screen ────────────────────────────────────────────────────── */
+
+.config-buttons {
+    layout: horizontal;
+    height: 3;
+    margin-top: 1;
+}
+
+#config-status {
+    background: #11111b;
+    color: #cdd6f4;
+    padding: 0 2;
+    height: 1;
+    border-top: solid #313244;
+    margin-top: 1;
+}
+
+/* ── Inputs ───────────────────────────────────────────────────────────── */
+
+Input {
+    background: #313244;
+    color: #cdd6f4;
+    border: solid #45475a;
+}
+
+Input:focus {
+    border: solid #89b4fa;
+}
+
+Select {
+    background: #313244;
+    color: #cdd6f4;
+    border: solid #45475a;
+}
+
+Select:focus {
+    border: solid #89b4fa;
+}
+
+Checkbox {
+    background: #1e1e2e;
+    color: #cdd6f4;
+}
+
+/* ── Buttons ──────────────────────────────────────────────────────────── */
+
+Button {
+    background: #313244;
+    color: #cdd6f4;
+    border: solid #45475a;
+    margin: 0 1 0 0;
+}
+
+Button:hover {
+    background: #45475a;
+    border: solid #585b70;
+}
+
+Button:focus {
+    border: solid #89b4fa;
+}
+
+Button.primary {
+    background: #1e3a5f;
+    color: #89b4fa;
+    border: solid #89b4fa;
+}
+
+Button.warning {
+    background: #3d3012;
+    color: #f9e2af;
+    border: solid #f9e2af;
+}
+
+Button.danger {
+    background: #3d1a24;
+    color: #f38ba8;
+    border: solid #f38ba8;
+}
+
+Button.success {
+    background: #1c3a2a;
+    color: #a6e3a1;
+    border: solid #a6e3a1;
+}
+
+/* ── Scrollbars ───────────────────────────────────────────────────────── */
+
+ScrollableContainer {
+    scrollbar-background: #1e1e2e;
+    scrollbar-color: #45475a;
+    scrollbar-color-hover: #585b70;
+    scrollbar-color-active: #89b4fa;
+}
+
+DataTable > .datatable--header {
+    background: #11111b;
+    color: #89b4fa;
+    text-style: bold;
+}
+
+DataTable > .datatable--cursor {
+    background: #313244;
+    color: #cdd6f4;
+}
