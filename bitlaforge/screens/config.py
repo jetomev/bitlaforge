@@ -14,11 +14,12 @@ from textual.binding import Binding
 from textual.widgets import Label, Static, Input, Button, Select
 from textual.containers import Container, Vertical, Horizontal
 
+from ..config_manager import load_config, save_config, DEFAULT_CONFIG, CONFIG_PATH
 from ..widgets.status import StatusMixin
 from ..widgets.confirm_dialog import ConfirmDialog
 
 
-_DEFAULT_ALGORITHM = "sha256d"
+_DEFAULT_ALGORITHM = DEFAULT_CONFIG["algorithm"]
 _AVAILABLE_ALGORITHMS = [
     "sha256d", "scrypt", "yescrypt", "x11", "x13", "x15", "x17", "groestl",
 ]
@@ -42,13 +43,9 @@ class ConfigScreen(StatusMixin, Container):
 
     def __init__(self, **kwargs) -> None:
         super().__init__(**kwargs)
-        # In-memory config for v0.1.0 (persisted in v0.1.2).
-        self._config: dict = {
-            "pool": "",
-            "wallet": "",
-            "algorithm": _DEFAULT_ALGORITHM,
-            "threads": "0",  # 0 = auto-detect
-        }
+        # G1 (v0.1.1): config is loaded from ~/.config/bitlaforge/config.toml.
+        # First launch returns DEFAULT_CONFIG; persists across launches.
+        self._config: dict = load_config()
 
     def compose(self) -> ComposeResult:
         with Vertical(classes="main-area"):
@@ -86,10 +83,15 @@ class ConfigScreen(StatusMixin, Container):
 
     def on_mount(self) -> None:
         self._populate_inputs()
-        self._set_status(
-            "Config loaded (in-memory; persistence lands in v0.1.2).",
-            "info", popup=False,
-        )
+        if CONFIG_PATH.exists():
+            self._set_status(
+                f"Config loaded from {CONFIG_PATH}", "info", popup=False,
+            )
+        else:
+            self._set_status(
+                "No saved config yet — fill in pool + wallet and press S to save.",
+                "info", popup=False,
+            )
 
     def on_show(self) -> None:
         # Silent reload — preserves any unsaved field edits the user typed
@@ -138,10 +140,16 @@ class ConfigScreen(StatusMixin, Container):
             if not confirmed:
                 self._set_status("Save cancelled.", "info")
                 return
-            self._config = new_config
-            self._set_status(
-                "Configuration saved (in-memory until v0.1.2).", "ok",
-            )
+            if save_config(new_config):
+                self._config = new_config
+                self._set_status(
+                    f"Saved to {CONFIG_PATH}", "ok",
+                )
+            else:
+                self._set_status(
+                    f"Failed to write {CONFIG_PATH} — check permissions.",
+                    "error",
+                )
 
         self.app.push_screen(
             ConfirmDialog(
