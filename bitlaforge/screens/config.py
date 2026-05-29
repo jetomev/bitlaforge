@@ -28,7 +28,12 @@ class ConfigScreen(StatusMixin, Container):
     """Edit the miner's pool/wallet/algorithm/thread settings."""
 
     STATUS_WIDGET_ID = "config-status"
-    DEFAULT_FOCUS = "#config-pool"
+    # Focus the screen container, NOT an Input — Inputs absorb digit keys
+    # and wallets/pool ports contain digits, so we don't want them captured
+    # for navigation. The user presses E to enter edit mode (focuses the
+    # first input); clicking the sidebar or pressing 1/2/3 navigates out.
+    can_focus = True
+    DEFAULT_FOCUS = "#config"
 
     BINDINGS = [
         Binding("e", "focus_first",  "Edit", show=True),

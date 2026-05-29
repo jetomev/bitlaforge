@@ -28,7 +28,10 @@ class LogScreen(StatusMixin, Container):
     """Streaming view of minerd stdout."""
 
     STATUS_WIDGET_ID = "log-status"
-    DEFAULT_FOCUS = "#log-search"
+    # Focus the scroll container, NOT the search Input — Inputs absorb every
+    # character key (1/2/3/M would type instead of triggering app bindings).
+    # The user presses `/` when they actually want to search.
+    DEFAULT_FOCUS = "#log-view-container"
 
     BINDINGS = [
         Binding("slash", "focus_search", "Search", show=True),

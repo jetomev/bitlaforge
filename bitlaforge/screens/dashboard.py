@@ -25,6 +25,13 @@ class DashboardScreen(StatusMixin, Container):
     # (mirrors alacrittyForge / grubForge's Dashboard pattern).
     STATUS_WIDGET_ID = None
 
+    # Focusable so the app can place initial focus here at startup —
+    # otherwise Textual auto-focuses the first focusable widget across
+    # the whole DOM, which is Log's search Input, and 1/2/3/M get typed
+    # into the input instead of triggering app bindings.
+    can_focus = True
+    DEFAULT_FOCUS = "#dashboard"
+
     def compose(self) -> ComposeResult:
         with Vertical(classes="main-area"):
             yield Label("⚡  BitlaForge — Miner Overview", classes="section-title")

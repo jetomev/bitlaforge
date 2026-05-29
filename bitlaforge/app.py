@@ -14,6 +14,7 @@ Log screen and updates Dashboard fields.
 
 from pathlib import Path
 
+from textual import events
 from textual.app import App, ComposeResult
 from textual.binding import Binding
 from textual.widgets import Header, Footer, Label, ContentSwitcher
@@ -74,6 +75,30 @@ class BitlaForgeApp(App):
                 yield LogScreen(id="log")
                 yield ConfigScreen(id="config")
         yield Footer()
+
+    def on_mount(self) -> None:
+        """Land initial focus on the Dashboard.
+
+        Without this, Textual auto-focuses the first focusable widget in
+        the DOM — which is Log's search Input — and every character key
+        (1, 2, 3, m, …) gets typed into the input instead of firing the
+        app-level bindings. Dashboard is set to ``can_focus = True`` so it
+        accepts focus and bubbles character keys back up to the app.
+        """
+        try:
+            self.query_one("#dashboard").focus()
+        except Exception:
+            pass
+
+    def on_click(self, event: events.Click) -> None:
+        """Route sidebar nav-item clicks to action_show_screen.
+
+        Mirrors the grubForge sidebar click pattern. Catches the click on
+        whichever Label has id ``nav-<screen>`` and switches to that screen.
+        """
+        wid = getattr(event.widget, "id", "") or ""
+        if wid.startswith("nav-"):
+            self.action_show_screen(wid[4:])
 
     # ── Screen switching ──────────────────────────────────────────────────
 
