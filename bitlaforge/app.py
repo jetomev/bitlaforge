@@ -20,6 +20,8 @@ from textual.binding import Binding
 from textual.widgets import Header, Footer, Label, ContentSwitcher
 from textual.containers import Horizontal, Vertical
 
+from .config_manager import load_config
+from .miner_runner import MinerRunner, MinerStats
 from .screens.dashboard import DashboardScreen
 from .screens.log import LogScreen
 from .screens.config import ConfigScreen
@@ -52,9 +54,26 @@ class BitlaForgeApp(App):
         Binding("question_mark", "show_help",    "Help",       show=True),
     ]
 
-    # Reactive-ish: the M toggle flips this; screens read it to render state.
-    miner_running: bool = False
+    # Reactive-ish state the screens read on _reload_view. Updated by the
+    # MinerRunner callbacks below.
+    miner_stats: MinerStats = MinerStats()
     _current_screen: str = "dashboard"
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Single runner instance per App. Callbacks forward stdout lines
+        # to the Log screen and pump stats updates through to Dashboard.
+        self._runner = MinerRunner(
+            on_line=self._on_miner_line,
+            on_stats=self._on_miner_stats,
+        )
+
+    # Backwards-compat shim — the v0.1.0 skeleton exposed `miner_running`
+    # as a bool. Anything still reading it gets the value off the live
+    # MinerStats object now.
+    @property
+    def miner_running(self) -> bool:
+        return self.miner_stats.running
 
     def compose(self) -> ComposeResult:
         yield Header(show_clock=False)
@@ -143,24 +162,51 @@ class BitlaForgeApp(App):
 
     # ── Actions ───────────────────────────────────────────────────────────
 
-    def action_toggle_miner(self) -> None:
-        """Toggle the miner state.
+    async def action_toggle_miner(self) -> None:
+        """Toggle the minerd subprocess (G2 — v0.1.1).
 
-        v0.1.0 stub — just flips `miner_running` and notifies. v0.1.1
-        replaces this with a real `asyncio.create_subprocess_exec` lifecycle
-        that spawns `minerd`, pipes stdout into the Log screen via
-        `LogScreen.append_line`, and stops it cleanly on toggle-off.
+        On start: load the persisted config, validate that pool+wallet are
+        set, then spawn minerd via MinerRunner. On stop: terminate
+        gracefully (SIGTERM, fallback SIGKILL after 3s).
         """
-        self.miner_running = not self.miner_running
-        if self.miner_running:
-            self.notify(
-                "Miner started (stub — minerd integration lands in v0.1.1).",
-                severity="information", timeout=4,
-            )
-        else:
+        if self._runner.is_running:
+            await self._runner.stop()
             self.notify("Miner stopped.", severity="information", timeout=4)
+            return
 
-        # Re-render Dashboard so the state header updates.
+        config = load_config()
+        missing = [k for k in ("pool", "wallet") if not config.get(k)]
+        if missing:
+            self.notify(
+                f"Configure {', '.join(missing)} first (press 3).",
+                severity="warning", timeout=5,
+            )
+            return
+
+        ok, msg = await self._runner.start(config)
+        if ok:
+            self.notify(f"Miner started — {msg}", severity="information", timeout=4)
+        else:
+            # The most common failure is FileNotFoundError on the minerd binary.
+            # G3 lands a clearer install-guidance flow; for G2 we surface the
+            # raw error message so it isn't silent.
+            self.notify(
+                f"Failed to start miner: {msg}",
+                severity="error", timeout=6,
+            )
+
+    # ── MinerRunner callbacks ─────────────────────────────────────────────
+
+    def _on_miner_line(self, line: str) -> None:
+        """Forward one minerd stdout line into the Log screen's bounded buffer."""
+        try:
+            self.query_one("#log").append_line(line)
+        except Exception:
+            pass
+
+    def _on_miner_stats(self, stats: MinerStats) -> None:
+        """Store the latest stats snapshot and ask the Dashboard to repaint."""
+        self.miner_stats = stats
         try:
             self.query_one("#dashboard")._reload_view()
         except Exception:

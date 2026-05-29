@@ -46,10 +46,46 @@ class DashboardScreen(StatusMixin, Container):
         self._reload_view()
 
     def _reload_view(self) -> None:
-        """Render the dashboard content. v0.1.0 stub — placeholder fields."""
-        # Read miner_running off the app so the header reflects the M toggle.
-        running = getattr(self.app, "miner_running", False)
-        state_str = "[#a6e3a1]● running[/]" if running else "[#6c7086]○ stopped[/]"
+        """Render the dashboard content from live MinerStats off the app."""
+        from ..miner_runner import MinerStats  # local import to avoid cycle
+        stats: MinerStats = getattr(self.app, "miner_stats", MinerStats())
+
+        # State header.
+        state_str = "[#a6e3a1]● running[/]" if stats.running else "[#6c7086]○ stopped[/]"
+
+        # Pool: split off "stratum+tcp://" for readability and pull the port out.
+        pool_raw = stats.pool or "—"
+        if "://" in pool_raw:
+            _, _, hostport = pool_raw.partition("://")
+        else:
+            hostport = pool_raw
+        if ":" in hostport and hostport != "—":
+            host, _, port = hostport.rpartition(":")
+            pool_display = host or "—"
+            port_display = port or "—"
+        else:
+            pool_display = hostport
+            port_display = "—"
+
+        wallet_display = stats.wallet if stats.wallet else "—"
+        if len(wallet_display) > 42:  # truncate long Bitcoin addresses
+            wallet_display = wallet_display[:18] + "…" + wallet_display[-10:]
+
+        # Performance / session.
+        hashrate_str = (
+            f"{stats.hashrate_khs:.2f} kh/s" if stats.hashrate_khs > 0 else "—"
+        )
+        threads_str = str(stats.threads) if stats.threads > 0 else "—"
+        uptime_secs = stats.uptime_seconds
+        uptime_str = (
+            f"{uptime_secs // 3600}h {(uptime_secs % 3600) // 60}m {uptime_secs % 60}s"
+            if uptime_secs > 0 else "—"
+        )
+        shares_str = (
+            f"{stats.accepted} accepted / {stats.rejected} rejected"
+            if (stats.accepted or stats.rejected) else "— accepted / — rejected"
+        )
+        algo_str = stats.algorithm if stats.algorithm else "—"
 
         content = (
             "\n"
@@ -57,21 +93,20 @@ class DashboardScreen(StatusMixin, Container):
             "\n"
             "[bold #cba6f7]── Pool & Wallet ────────────────────────────────[/]\n"
             "\n"
-            "  [#89b4fa]Pool          [/]  [#6c7086]— (configure on Config screen)[/]\n"
-            "  [#89b4fa]Port          [/]  [#6c7086]—[/]\n"
-            "  [#89b4fa]Wallet        [/]  [#6c7086]—[/]\n"
+            f"  [#89b4fa]Pool          [/]  [#cdd6f4]{pool_display}[/]\n"
+            f"  [#89b4fa]Port          [/]  [#cdd6f4]{port_display}[/]\n"
+            f"  [#89b4fa]Wallet        [/]  [#cdd6f4]{wallet_display}[/]\n"
+            f"  [#89b4fa]Algorithm     [/]  [#cdd6f4]{algo_str}[/]\n"
             "\n"
             "[bold #cba6f7]── Performance ──────────────────────────────────[/]\n"
             "\n"
-            "  [#89b4fa]CPU load      [/]  [#6c7086]—[/]\n"
-            "  [#89b4fa]Threads       [/]  [#6c7086]—[/]\n"
-            "  [#89b4fa]Hashrate      [/]  [#6c7086]—[/]\n"
+            f"  [#89b4fa]Threads       [/]  [#cdd6f4]{threads_str}[/]\n"
+            f"  [#89b4fa]Hashrate      [/]  [#cdd6f4]{hashrate_str}[/]\n"
             "\n"
             "[bold #cba6f7]── Session ──────────────────────────────────────[/]\n"
             "\n"
-            "  [#89b4fa]Uptime        [/]  [#6c7086]—[/]\n"
-            "  [#89b4fa]Shares        [/]  [#6c7086]— accepted / — rejected[/]\n"
-            "  [#89b4fa]Log lines     [/]  [#6c7086]0[/]\n"
+            f"  [#89b4fa]Uptime        [/]  [#cdd6f4]{uptime_str}[/]\n"
+            f"  [#89b4fa]Shares        [/]  [#cdd6f4]{shares_str}[/]\n"
             "\n"
             "[bold #cba6f7]── Quick Actions ────────────────────────────────[/]\n"
             "\n"
@@ -79,9 +114,6 @@ class DashboardScreen(StatusMixin, Container):
             "  Press [bold #b4befe]3[/]  to edit miner configuration\n"
             "  Press [bold #b4befe]2[/]  to watch the log stream\n"
             "  Press [bold #b4befe]?[/]  for help\n"
-            "\n"
-            "[dim italic]  ↳ v0.1.0 alpha: all fields are placeholders;\n"
-            "    real minerd integration lands in v0.1.1.[/]\n"
         )
         self.query_one("#dashboard-content", Static).update(content)
 
