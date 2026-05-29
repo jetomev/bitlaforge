@@ -27,9 +27,29 @@ from __future__ import annotations
 
 import asyncio
 import re
+import shutil
 import time
 from dataclasses import dataclass, field
 from typing import Awaitable, Callable, Optional
+
+
+def find_minerd(binary: str = "minerd") -> Optional[str]:
+    """Return the absolute path of the minerd binary on PATH, or None.
+
+    Used at app launch to decide whether to show the install-guidance
+    banner, and again on each M press so installing mid-session works
+    without a relaunch.
+    """
+    return shutil.which(binary)
+
+
+# Catalogue of AUR providers, used in install-guidance toasts and the
+# Dashboard banner. Order matters — top entry is the recommended default.
+MINERD_AUR_PROVIDERS: tuple[tuple[str, str], ...] = (
+    ("cpuminer",       "pooler's original (recommended)"),
+    ("cpuminer-multi", "multi-algorithm fork"),
+    ("cpuminer-opt",   "heavily optimized variant"),
+)
 
 
 # ── Stats model ───────────────────────────────────────────────────────────

@@ -21,7 +21,7 @@ from textual.widgets import Header, Footer, Label, ContentSwitcher
 from textual.containers import Horizontal, Vertical
 
 from .config_manager import load_config
-from .miner_runner import MinerRunner, MinerStats
+from .miner_runner import MinerRunner, MinerStats, find_minerd
 from .screens.dashboard import DashboardScreen
 from .screens.log import LogScreen
 from .screens.config import ConfigScreen
@@ -163,15 +163,31 @@ class BitlaForgeApp(App):
     # ── Actions ───────────────────────────────────────────────────────────
 
     async def action_toggle_miner(self) -> None:
-        """Toggle the minerd subprocess (G2 — v0.1.1).
+        """Toggle the minerd subprocess.
 
-        On start: load the persisted config, validate that pool+wallet are
-        set, then spawn minerd via MinerRunner. On stop: terminate
-        gracefully (SIGTERM, fallback SIGKILL after 3s).
+        G2 wired the subprocess lifecycle; G3 adds the friendly guards:
+        check `minerd` is actually on PATH before attempting to spawn it,
+        validate that pool + wallet are configured, and surface clear
+        next-step guidance on each failure path.
         """
         if self._runner.is_running:
             await self._runner.stop()
             self.notify("Miner stopped.", severity="information", timeout=4)
+            return
+
+        # G3: friendly install-guidance before we even try to spawn.
+        if find_minerd() is None:
+            self.notify(
+                "minerd not found on PATH — install one of: cpuminer / "
+                "cpuminer-multi / cpuminer-opt from AUR (e.g. "
+                "`yay -S cpuminer`). Then press M again.",
+                severity="warning", timeout=8,
+            )
+            # Repaint Dashboard so the banner reflects the same state.
+            try:
+                self.query_one("#dashboard")._reload_view()
+            except Exception:
+                pass
             return
 
         config = load_config()
@@ -187,9 +203,6 @@ class BitlaForgeApp(App):
         if ok:
             self.notify(f"Miner started — {msg}", severity="information", timeout=4)
         else:
-            # The most common failure is FileNotFoundError on the minerd binary.
-            # G3 lands a clearer install-guidance flow; for G2 we surface the
-            # raw error message so it isn't silent.
             self.notify(
                 f"Failed to start miner: {msg}",
                 severity="error", timeout=6,

@@ -47,8 +47,23 @@ class DashboardScreen(StatusMixin, Container):
 
     def _reload_view(self) -> None:
         """Render the dashboard content from live MinerStats off the app."""
-        from ..miner_runner import MinerStats  # local import to avoid cycle
+        from ..miner_runner import MinerStats, find_minerd  # local imports avoid cycle
         stats: MinerStats = getattr(self.app, "miner_stats", MinerStats())
+        minerd_path = find_minerd()
+
+        # G3: persistent banner whenever the minerd binary isn't found on
+        # PATH. Sits above everything else so it's the first thing the
+        # user sees on Dashboard. Re-checked on every reload, so installing
+        # mid-session and pressing R clears the banner without a relaunch.
+        if minerd_path is None:
+            banner = (
+                "[bold #f38ba8 reverse] ⚠  minerd not detected [/]  "
+                "[#f9e2af]install one of: cpuminer / cpuminer-multi / cpuminer-opt "
+                "from AUR (e.g. `yay -S cpuminer`).[/]\n"
+                "\n"
+            )
+        else:
+            banner = ""
 
         # State header.
         state_str = "[#a6e3a1]● running[/]" if stats.running else "[#6c7086]○ stopped[/]"
@@ -89,6 +104,7 @@ class DashboardScreen(StatusMixin, Container):
 
         content = (
             "\n"
+            f"  {banner}"
             f"  [#89b4fa]Miner state[/]   {state_str}\n"
             "\n"
             "[bold #cba6f7]── Pool & Wallet ────────────────────────────────[/]\n"
