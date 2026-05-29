@@ -53,7 +53,7 @@ class HelpScreen(ModalScreen):
         with Vertical():
             yield Label("⚡ BitlaForge — Help", classes="help-title")
             yield Label("── Global ───────────────────────────", classes="help-section")
-            yield Label("  1-3    Switch screens",       classes="help-line")
+            yield Label("  1-4    Switch screens",       classes="help-line")
             yield Label("  M      Start / stop miner",   classes="help-line")
             yield Label("  R      Refresh current screen", classes="help-line")
             yield Label("  q      Quit",                 classes="help-line")
@@ -66,6 +66,8 @@ class HelpScreen(ModalScreen):
             yield Label("── Config ───────────────────────────", classes="help-section")
             yield Label("  E      Edit selected field",  classes="help-line")
             yield Label("  S      Save configuration",   classes="help-line")
+            yield Label("── Setup ────────────────────────────", classes="help-section")
+            yield Label("  T      Test minerd binary",   classes="help-line")
             yield Label("", classes="help-line")
             yield Label("  Press Esc, q, or ? to close", classes="help-section")
 

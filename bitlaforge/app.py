@@ -25,6 +25,7 @@ from .miner_runner import MinerRunner, MinerStats, find_minerd
 from .screens.dashboard import DashboardScreen
 from .screens.log import LogScreen
 from .screens.config import ConfigScreen
+from .screens.setup import SetupScreen
 from .widgets.help_screen import HelpScreen
 
 
@@ -33,6 +34,7 @@ NAV_ITEMS = [
     ("1", "dashboard", "🏠  Dashboard"),
     ("2", "log",       "📜  Log"),
     ("3", "config",    "⚙   Config"),
+    ("4", "setup",     "🛠   Setup"),
 ]
 
 
@@ -46,6 +48,7 @@ class BitlaForgeApp(App):
         Binding("1", "show_screen('dashboard')", "Dashboard",  show=True),
         Binding("2", "show_screen('log')",       "Log",        show=True),
         Binding("3", "show_screen('config')",    "Config",     show=True),
+        Binding("4", "show_screen('setup')",     "Setup",      show=True),
         # M for Miner toggle (S is reserved for screen-level Save on Config,
         # mirroring the alacrittyForge / grubForge convention).
         Binding("m", "toggle_miner",             "Start/Stop", show=True),
@@ -93,6 +96,7 @@ class BitlaForgeApp(App):
                 yield DashboardScreen(id="dashboard")
                 yield LogScreen(id="log")
                 yield ConfigScreen(id="config")
+                yield SetupScreen(id="setup")
         yield Footer()
 
     def on_mount(self) -> None:
