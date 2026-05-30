@@ -80,6 +80,11 @@ class MinerStats:
     threads: int = 0                   # 1 + max(thread index) seen so far
     started_at: Optional[float] = None  # time.time() when the process started
 
+    # Per-process readouts (G5 v0.1.2). Updated by the App's 1-second tick
+    # from /proc/<pid>/stat + /proc/<pid>/status — not by the parser.
+    cpu_pct: float = 0.0               # 100% = one logical core fully used
+    mem_mb: int = 0                    # resident set size in MiB
+
     # Config the miner was started with (echoed for the dashboard).
     pool: str = ""
     wallet: str = ""
@@ -170,6 +175,19 @@ class MinerRunner:
     @property
     def stats(self) -> MinerStats:
         return self._stats
+
+    @property
+    def pid(self) -> Optional[int]:
+        """The minerd process pid, or None if no process is running.
+
+        Used by the App's 1-second tick to read /proc/<pid>/stat for the
+        CPU% / mem readouts on the Dashboard. Note: when niceness > 0 the
+        spawned process is `nice`, not minerd directly — but `nice` exec's
+        minerd in place, so the pid is the minerd pid either way.
+        """
+        if self._proc is None or self._proc.returncode is not None:
+            return None
+        return self._proc.pid
 
     async def start(
         self,

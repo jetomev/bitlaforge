@@ -22,6 +22,7 @@ from textual.containers import Horizontal, Vertical
 
 from .config_manager import load_config
 from .miner_runner import MinerRunner, MinerStats, find_minerd
+from .process_stats import read_process_sample, compute_cpu_pct
 from .screens.dashboard import DashboardScreen
 from .screens.log import LogScreen
 from .screens.config import ConfigScreen
@@ -75,6 +76,9 @@ class BitlaForgeApp(App):
         # for the next minerd hashmeter line. Set to a Textual Timer when
         # the miner is running, None otherwise.
         self._tick_timer = None
+        # G5 (v0.1.2): previous /proc/<pid>/stat sample used to compute the
+        # CPU% delta on each tick. Reset on start, cleared on stop.
+        self._proc_prev = None
 
     # Backwards-compat shim — the v0.1.0 skeleton exposed `miner_running`
     # as a bool. Anything still reading it gets the value off the live
@@ -249,6 +253,11 @@ class BitlaForgeApp(App):
         """Install a 1-second timer that re-renders the Dashboard."""
         if self._tick_timer is not None:
             return  # already running
+        # Seed a baseline sample so the first interval has something to
+        # diff against — without this the first tick would read 0% CPU.
+        pid = self._runner.pid
+        if pid is not None:
+            self._proc_prev = read_process_sample(pid)
         self._tick_timer = self.set_interval(1.0, self._on_tick)
 
     def _stop_live_tick(self) -> None:
@@ -258,9 +267,23 @@ class BitlaForgeApp(App):
             except Exception:
                 pass
             self._tick_timer = None
+        self._proc_prev = None
 
     def _on_tick(self) -> None:
-        """Re-render the Dashboard so uptime keeps ticking between events."""
+        """Re-render the Dashboard so uptime keeps ticking between events.
+
+        Also samples /proc/<pid>/ for the running minerd (G5) and computes
+        live CPU% / mem MB into miner_stats so the Dashboard surfaces them
+        next render.
+        """
+        pid = self._runner.pid
+        if pid is not None:
+            sample = read_process_sample(pid)
+            if sample is not None:
+                self.miner_stats.mem_mb = sample.rss_mb
+                if self._proc_prev is not None:
+                    self.miner_stats.cpu_pct = compute_cpu_pct(self._proc_prev, sample)
+                self._proc_prev = sample
         try:
             self.query_one("#dashboard")._reload_view()
         except Exception:

@@ -108,6 +108,12 @@ class DashboardScreen(StatusMixin, Container):
             f"{stats.hashrate_khs:.2f} kh/s" if stats.hashrate_khs > 0 else "—"
         )
         threads_str = str(stats.threads) if stats.threads > 0 else "—"
+        # G5: per-process CPU/MEM — htop convention (100% = one logical core).
+        if stats.running and stats.cpu_pct > 0:
+            cpu_str = f"{stats.cpu_pct:6.1f}%"
+        else:
+            cpu_str = "—"
+        mem_str = f"{stats.mem_mb} MB" if stats.running and stats.mem_mb > 0 else "—"
         uptime_secs = stats.uptime_seconds
         uptime_str = (
             f"{uptime_secs // 3600}h {(uptime_secs % 3600) // 60}m {uptime_secs % 60}s"
@@ -135,6 +141,9 @@ class DashboardScreen(StatusMixin, Container):
             "\n"
             f"  [#89b4fa]Threads       [/]  [#cdd6f4]{threads_str}[/]\n"
             f"  [#89b4fa]Hashrate      [/]  [#cdd6f4]{hashrate_str}[/]\n"
+            f"  [#89b4fa]minerd CPU    [/]  [#cdd6f4]{cpu_str}[/]  "
+            f"[dim](100% = one logical core)[/]\n"
+            f"  [#89b4fa]minerd RAM    [/]  [#cdd6f4]{mem_str}[/]\n"
             "\n"
             "[bold #cba6f7]── Session ──────────────────────────────────────[/]\n"
             "\n"
