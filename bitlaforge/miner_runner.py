@@ -43,6 +43,20 @@ def find_minerd(binary: str = "minerd") -> Optional[str]:
     return shutil.which(binary)
 
 
+def sanitize_worker_name(name: str) -> str:
+    """Strip a name down to the pool-safe character set.
+
+    Stratum worker names are usually accepted as alphanumeric + ``-`` /
+    ``_``. Lowercase isn't required but normalising avoids quietly
+    splitting one rig into two on the pool dashboard if the user types
+    "Laptop" once and "laptop" the next time.
+    """
+    return "".join(
+        c.lower() if (c.isalnum() or c in "-_") else ""
+        for c in name.strip()
+    )
+
+
 # Catalogue of AUR providers, used in install-guidance toasts and the
 # Dashboard banner. Order matters — top entry is the recommended default.
 MINERD_AUR_PROVIDERS: tuple[tuple[str, str], ...] = (
@@ -167,24 +181,42 @@ class MinerRunner:
 
         Returns ``(ok, message)``. ``ok=False`` covers binary-not-found,
         already-running, and OS-level spawn failure.
+
+        When ``config["niceness"]`` is a positive integer, the binary is
+        wrapped with ``nice -n N`` so the spawned process runs at a lower
+        scheduler priority. Anything ≤ 0 (the default for "normal") runs
+        the binary directly.
         """
         if self.is_running:
             return False, "miner already running"
 
         args = self._build_args(config)
 
+        # G3 (v0.1.2): nice wrapper.
+        try:
+            niceness = int(config.get("niceness", "0"))
+        except (TypeError, ValueError):
+            niceness = 0
+        if niceness > 0:
+            cmd = ["nice", "-n", str(niceness), binary, *args]
+        else:
+            cmd = [binary, *args]
+
         try:
             self._proc = await asyncio.create_subprocess_exec(
-                binary, *args,
+                *cmd,
                 stdout=asyncio.subprocess.PIPE,
                 # Merge stderr into stdout so a single reader catches both —
                 # cpuminer logs status to stderr and worker output to stdout.
                 stderr=asyncio.subprocess.STDOUT,
             )
         except FileNotFoundError:
-            return False, f"binary not found on PATH: {binary}"
+            # If niceness is set, FileNotFoundError most likely points at
+            # `nice` itself (which lives in coreutils — essentially always
+            # present), but we keep the message agnostic.
+            return False, f"binary not found: {cmd[0]}"
         except OSError as e:
-            return False, f"failed to start {binary}: {e}"
+            return False, f"failed to start {cmd[0]}: {e}"
 
         # Reset stats with the config the miner was started against.
         self._stats = MinerStats(
@@ -225,7 +257,14 @@ class MinerRunner:
         self._on_stats(self._stats)
 
     def _build_args(self, config: dict) -> list[str]:
-        """Translate the saved config into pooler-cpuminer-compatible args."""
+        """Translate the saved config into pooler-cpuminer-compatible args.
+
+        Appends ``.workername`` to the wallet when ``config["miner_name"]``
+        is set, so the pool side sees per-rig stats via Stratum's standard
+        ``WALLET.WORKER`` convention. The worker name is sanitized down to
+        the pool-safe character set (alphanumeric + ``-`` / ``_``) — see
+        ``sanitize_worker_name``.
+        """
         args: list[str] = []
         algo = config.get("algorithm", "").strip()
         if algo:
@@ -237,7 +276,9 @@ class MinerRunner:
 
         wallet = config.get("wallet", "").strip()
         if wallet:
-            args += ["-u", wallet]
+            worker = sanitize_worker_name(config.get("miner_name", ""))
+            user = f"{wallet}.{worker}" if worker else wallet
+            args += ["-u", user]
             # Most pools want *some* password — "x" is the de-facto placeholder.
             args += ["-p", "x"]
 
