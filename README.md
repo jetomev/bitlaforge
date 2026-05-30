@@ -6,7 +6,7 @@
 ![Platform: Linux](https://img.shields.io/badge/Platform-Linux-lightgrey.svg)
 ![Python: 3.11+](https://img.shields.io/badge/Python-3.11+-green.svg)
 ![Status: Alpha](https://img.shields.io/badge/Status-Alpha-orange.svg)
-![Version: 0.1.1](https://img.shields.io/badge/Version-0.1.1-purple.svg)
+![Version: 0.1.2](https://img.shields.io/badge/Version-0.1.2-purple.svg)
 
 ---
 
@@ -120,15 +120,17 @@ AUR submission lands with v0.1.3 — once there's real mining behavior to verify
 bitlaforge/
 ├── main.py                                # Entry point
 ├── bitlaforge/
-│   ├── app.py                             # BitlaForgeApp shell + nav + M lifecycle
+│   ├── app.py                             # BitlaForgeApp shell + nav + M lifecycle + live tick
 │   ├── bitlaforge.css                     # Catppuccin Mocha stylesheet
 │   ├── config_manager.py                  # TOML read/write at ~/.config/bitlaforge/
 │   ├── miner_runner.py                    # Async minerd subprocess + stdout parsing
+│   ├── process_stats.py                   # /proc/<pid>/ CPU% + RAM readouts
+│   ├── system_info.py                     # /proc/cpuinfo + /proc/meminfo + load avg
 │   ├── screens/
 │   │   ├── dashboard.py                   # Live miner overview + missing-minerd banner
 │   │   ├── log.py                         # 5,000-line bounded buffer + filter
-│   │   ├── config.py                      # Pool / wallet / algorithm / threads
-│   │   └── setup.py                       # AUR install guide + minerd self-test
+│   │   ├── config.py                      # Pool / wallet / algorithm / threads / name / niceness
+│   │   └── setup.py                       # System info + AUR install guide + minerd self-test
 │   └── widgets/
 │       ├── status.py                      # StatusMixin (line + toast)
 │       ├── help_screen.py                 # Toggleable modal help
@@ -155,7 +157,7 @@ Mining is **opt-in**. Real CPU load, real electricity, real heat. BitlaForge wil
 - [x] `StatusMixin`, `HelpScreen`, `ConfirmDialog` ported from the Forge baseline
 - [x] Catppuccin Mocha styling
 
-### v0.1.1 — May 28, 2026 (current)
+### v0.1.1 — May 28, 2026
 - [x] Persist config to `~/.config/bitlaforge/config.toml` (TOML)
 - [x] Wire `minerd` via `asyncio.create_subprocess_exec`: spawn, parse stdout, stop cleanly
 - [x] Real Dashboard fields driven by parsed minerd output (hashrate / threads / accepted / rejected / uptime)
@@ -163,12 +165,21 @@ Mining is **opt-in**. Real CPU load, real electricity, real heat. BitlaForge wil
 - [x] Runtime `which("minerd")` check + Dashboard banner + friendly install guidance
 - [x] Setup screen with AUR provider list + `minerd --version` self-test
 
-### v0.1.2 — Planned
+### v0.1.2 — May 29, 2026 (current)
+- [x] System info on Setup screen (CPU model + logical/physical cores + load avg + memory) from stdlib
+- [x] Config gains **miner name** (default hostname; also used as Stratum worker name) and **niceness** (0–19, default 19)
+- [x] Threads input shows "of N available" hint from `os.cpu_count()`
+- [x] `miner_runner` appends `wallet.workername` and wraps with `nice -n N`
+- [x] Dashboard live tick (1s `set_interval` while mining) — uptime advances smoothly between hashmeter lines
+- [x] Miner name surfaced in the Dashboard title
+- [x] Live `minerd` CPU% / RAM from `/proc/<pid>/stat` + `/proc/<pid>/status` — makes the niceness setting observable
+
+### v0.1.3 — Planned
 - [ ] Start-miner pre-flight beyond pool+wallet (validate wallet format, optionally TCP-probe the pool)
 - [ ] Persistent log archive (rotating files in `~/.local/share/bitlaforge/`)
 - [ ] Per-session uptime / share totals across restarts
 
-### v0.1.3 — Planned (Forge release machinery + AUR)
+### v0.1.4 — Planned (Forge release machinery + AUR)
 - [ ] `testing/` (RELEASE-CHECKLIST + Test Matrix + dogfood Test Results)
 - [ ] Man page `bitlaforge.1`
 - [ ] PKGBUILD with hardened headless-mount `check()` + `optdepends` listing the cpuminer variants
@@ -182,6 +193,19 @@ Mining is **opt-in**. Real CPU load, real electricity, real heat. BitlaForge wil
 ---
 
 ## Changelog
+
+### v0.1.2 — May 29, 2026
+**Resource awareness + live Dashboard.**
+
+v0.1.1 made BitlaForge mine; v0.1.2 makes it feel alive while doing it. Five per-group commits, all stdlib (no new deps):
+
+- **G1 — System info on Setup.** New `bitlaforge/system_info.py` reads `/proc/cpuinfo`, `/proc/meminfo`, `os.getloadavg()`, and `os.cpu_count()` into a `SystemInfo` dataclass. The Setup screen gains a block above the minerd status showing **CPU model**, **logical/physical cores**, **memory total/available with % used**, and **1/5/15-minute load averages** color-graded against your core count (green when comfortably idle, yellow as load approaches your ceiling, red over it). Refreshes on **R**.
+- **G2 — Config gains miner name + niceness + threads hint.** Two new fields in `~/.config/bitlaforge/config.toml`: `miner_name` (defaults to `socket.gethostname()`) and `niceness` (0–19, default 19). The Thread count label dynamically shows "of N available" sourced from the same `os.cpu_count()`. Forward-compatible: a v0.1.1 TOML loads cleanly with new defaults silently applied.
+- **G3 — `miner_runner` worker name + nice wrapper.** `_build_args` now joins the sanitized `miner_name` to the wallet as `wallet.workername` (standard Stratum convention — pools show per-rig stats on their dashboards). `start()` wraps the spawn with `nice -n N` when niceness > 0; niceness ≤ 0 spawns directly with no overhead.
+- **G4 — Dashboard live tick + name in header.** App installs a 1-second `set_interval` timer when the miner starts, cancels on stop (and when the parser sees the process end on its own). Each tick re-renders the Dashboard so **uptime advances smoothly** between minerd hashmeter dumps. The Dashboard title now shows the miner name in mauve: `⚡ BitlaForge — Miner Overview — workstation-rig`.
+- **G5 — Live `minerd` CPU% / RAM from `/proc/<pid>/`.** New `process_stats.py` parses `/proc/<pid>/stat` (utime + stime ticks) and `/proc/<pid>/status` (VmRSS) — stdlib only, no `psutil`. The App tick captures a baseline at start, computes deltas on each tick, and writes `cpu_pct` (htop-style: 100% = one logical core) + `mem_mb` into `MinerStats`. Dashboard shows them under Performance. Makes the **niceness setting observable**: with niceness=19, you'll see minerd's CPU% drop the moment any other process needs cycles.
+
+No dependency changes. Same `python`, `python-textual`, `python-rich`, `python-tomli-w`.
 
 ### v0.1.1 — May 28, 2026
 **Make it actually mine.**
