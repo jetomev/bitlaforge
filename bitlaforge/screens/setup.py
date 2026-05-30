@@ -62,13 +62,48 @@ class SetupScreen(StatusMixin, Container):
         self._redraw()
 
     def _redraw(self) -> None:
-        """Re-paint the body — status block + provider list + paths.
+        """Re-paint the body — system info + minerd status + providers + paths.
 
         Named ``_redraw`` (not ``_render``) so it doesn't shadow Textual's
         internal ``Widget._render()`` — same lesson LogScreen caught in v0.1.0.
         """
         from ..miner_runner import find_minerd, MINERD_AUR_PROVIDERS
+        from ..system_info import get_system_info
+        info = get_system_info()
         minerd_path = find_minerd()
+
+        # G1 (v0.1.2): system info block — what's available to mine with.
+        # Refreshed on every R press so load averages stay current.
+        if info.physical_cores != info.logical_cores:
+            cores_str = (
+                f"{info.logical_cores} logical "
+                f"([dim]{info.physical_cores} physical[/])"
+            )
+        else:
+            cores_str = f"{info.logical_cores}"
+
+        mem_pct_used = (
+            int(100 * (1 - info.mem_available_mb / info.mem_total_mb))
+            if info.mem_total_mb > 0 else 0
+        )
+        load_color = (
+            "#a6e3a1" if info.load_1 < info.logical_cores * 0.5
+            else "#f9e2af" if info.load_1 < info.logical_cores * 0.9
+            else "#f38ba8"
+        )
+
+        system_block = (
+            f"  [#89b4fa]Host[/]         [#cdd6f4]{info.hostname}[/]\n"
+            f"  [#89b4fa]CPU[/]          [#cdd6f4]{info.cpu_model}[/]\n"
+            f"  [#89b4fa]Cores[/]        [#cdd6f4]{cores_str}[/]\n"
+            f"  [#89b4fa]Memory[/]       "
+            f"[#cdd6f4]{info.mem_available_mb / 1024:.1f} GB free "
+            f"of {info.mem_total_mb / 1024:.1f} GB[/]  "
+            f"[dim]({mem_pct_used}% used)[/]\n"
+            f"  [#89b4fa]Load avg[/]     "
+            f"[{load_color}]{info.load_1:.2f}[/]  "
+            f"[dim]{info.load_5:.2f} (5m)  {info.load_15:.2f} (15m)[/]\n"
+        )
         if minerd_path:
             status_block = (
                 "[bold #a6e3a1]✓ minerd is installed[/]\n"
@@ -92,6 +127,10 @@ class SetupScreen(StatusMixin, Container):
         )
 
         body = (
+            "\n"
+            "[bold #cba6f7]── System info ────────────────────────────────────[/]\n"
+            "\n"
+            f"{system_block}"
             "\n"
             "[bold #cba6f7]── minerd status ──────────────────────────────────[/]\n"
             "\n"
