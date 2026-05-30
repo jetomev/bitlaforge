@@ -108,9 +108,19 @@ class DashboardScreen(StatusMixin, Container):
             f"{stats.hashrate_khs:.2f} kh/s" if stats.hashrate_khs > 0 else "—"
         )
         threads_str = str(stats.threads) if stats.threads > 0 else "—"
-        # G5: per-process CPU/MEM — htop convention (100% = one logical core).
+        # G5: per-process CPU as a fraction of total cores — the htop
+        # convention (100% per logical core) gives jarring numbers like
+        # 1590% for a fully-saturated 16-core box. Render as "N.N / total
+        # cores (P%)" so the number reads intuitively at a glance.
         if stats.running and stats.cpu_pct > 0:
-            cpu_str = f"{stats.cpu_pct:6.1f}%"
+            from ..system_info import get_system_info
+            total_cores = max(get_system_info().logical_cores, 1)
+            cores_used = stats.cpu_pct / 100.0
+            of_total = (cores_used / total_cores) * 100.0
+            cpu_str = (
+                f"{cores_used:.1f} / {total_cores} cores  "
+                f"[dim]({of_total:.0f}%)[/]"
+            )
         else:
             cpu_str = "—"
         mem_str = f"{stats.mem_mb} MB" if stats.running and stats.mem_mb > 0 else "—"
@@ -141,8 +151,7 @@ class DashboardScreen(StatusMixin, Container):
             "\n"
             f"  [#89b4fa]Threads       [/]  [#cdd6f4]{threads_str}[/]\n"
             f"  [#89b4fa]Hashrate      [/]  [#cdd6f4]{hashrate_str}[/]\n"
-            f"  [#89b4fa]minerd CPU    [/]  [#cdd6f4]{cpu_str}[/]  "
-            f"[dim](100% = one logical core)[/]\n"
+            f"  [#89b4fa]minerd CPU    [/]  [#cdd6f4]{cpu_str}[/]\n"
             f"  [#89b4fa]minerd RAM    [/]  [#cdd6f4]{mem_str}[/]\n"
             "\n"
             "[bold #cba6f7]── Session ──────────────────────────────────────[/]\n"
