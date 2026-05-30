@@ -103,10 +103,11 @@ class DashboardScreen(StatusMixin, Container):
         if len(wallet_display) > 42:  # truncate long Bitcoin addresses
             wallet_display = wallet_display[:18] + "…" + wallet_display[-10:]
 
-        # Performance / session.
-        hashrate_str = (
-            f"{stats.hashrate_khs:.2f} kh/s" if stats.hashrate_khs > 0 else "—"
-        )
+        # Performance / session — hashrate uses auto-scaling (kh -> Mh -> Gh)
+        # because aggregate across 16 threads runs into the hundreds of
+        # thousands of kh/s on modern CPUs.
+        from ..miner_runner import format_hashrate
+        hashrate_str = format_hashrate(stats.hashrate_khs)
         threads_str = str(stats.threads) if stats.threads > 0 else "—"
         # G5: per-process CPU as a fraction of total cores — the htop
         # convention (100% per logical core) gives jarring numbers like

@@ -30,7 +30,7 @@ import re
 import shutil
 import time
 from dataclasses import dataclass, field
-from typing import Awaitable, Callable, Optional
+from typing import Awaitable, Callable, Dict, Optional
 
 
 def find_minerd(binary: str = "minerd") -> Optional[str]:
@@ -74,11 +74,18 @@ class MinerStats:
     """Snapshot of miner state. Read by the Dashboard, written by the runner."""
 
     running: bool = False
-    hashrate_khs: float = 0.0          # latest khash/s value observed
+    hashrate_khs: float = 0.0          # AGGREGATE kh/s — sum of per-thread rates
     accepted: int = 0                  # accepted shares (from "accepted: N/M")
     rejected: int = 0                  # rejected shares
     threads: int = 0                   # 1 + max(thread index) seen so far
     started_at: Optional[float] = None  # time.time() when the process started
+
+    # Per-thread hashrate state (v0.1.2 post-release fix). cpuminer emits
+    # one "thread N: X khash/s" line per thread per scantime, so we keep
+    # the latest rate seen for each thread and the aggregate is sum of
+    # values. Without this, hashrate_khs would just hold whichever thread
+    # reported last instead of the rig total.
+    thread_rates: Dict[int, float] = field(default_factory=dict)
 
     # Per-process readouts (G5 v0.1.2). Updated by the App's 1-second tick
     # from /proc/<pid>/stat + /proc/<pid>/status — not by the parser.
@@ -100,10 +107,18 @@ class MinerStats:
 # ── Output parsing ────────────────────────────────────────────────────────
 
 
-_RE_HASHRATE = re.compile(r"(\d+\.\d+)\s*khash/s", re.IGNORECASE)
-_RE_ACCEPTED = re.compile(r"accepted:\s*(\d+)/(\d+)", re.IGNORECASE)
-_RE_REJECTED = re.compile(r"rejected:\s*(\d+)/(\d+)", re.IGNORECASE)
-_RE_THREAD   = re.compile(r"thread\s+(\d+):", re.IGNORECASE)
+# cpuminer emits both integer (e.g. "10247 khash/s") and decimal rates
+# (e.g. "4.20 khash/s"), so the decimal part is optional. Old regex
+# required the decimal and silently dropped every integer-rate line —
+# rigs fast enough to round to integers (most modern SHA-256 ones)
+# never updated hashrate.
+_RE_THREAD_RATE = re.compile(
+    r"thread\s+(\d+):.*?(\d+(?:\.\d+)?)\s*khash/s", re.IGNORECASE,
+)
+_RE_HASHRATE    = re.compile(r"(\d+(?:\.\d+)?)\s*khash/s", re.IGNORECASE)
+_RE_ACCEPTED    = re.compile(r"accepted:\s*(\d+)/(\d+)", re.IGNORECASE)
+_RE_REJECTED    = re.compile(r"rejected:\s*(\d+)/(\d+)", re.IGNORECASE)
+_RE_THREAD      = re.compile(r"thread\s+(\d+):", re.IGNORECASE)
 
 
 def parse_line(line: str, stats: MinerStats) -> bool:
@@ -111,12 +126,33 @@ def parse_line(line: str, stats: MinerStats) -> bool:
     if any field actually changed (so the caller knows whether to repaint)."""
     updated = False
 
-    m = _RE_HASHRATE.search(line)
+    # Per-thread hashrate report — the dominant cpuminer output.
+    # Captures both the thread index AND the rate, so we can maintain a
+    # per-thread map and sum it for the aggregate rig hashrate.
+    m = _RE_THREAD_RATE.search(line)
     if m:
-        new = float(m.group(1))
-        if new != stats.hashrate_khs:
-            stats.hashrate_khs = new
+        tid = int(m.group(1))
+        rate = float(m.group(2))
+        if stats.thread_rates.get(tid) != rate:
+            stats.thread_rates[tid] = rate
+            new_total = sum(stats.thread_rates.values())
+            if new_total != stats.hashrate_khs:
+                stats.hashrate_khs = new_total
+                updated = True
+        new_threads = max(stats.thread_rates) + 1
+        if new_threads > stats.threads:
+            stats.threads = new_threads
             updated = True
+    else:
+        # Fallback for unusual lines that mention khash/s without a
+        # thread tag — e.g. some summary lines on share submission.
+        # Last-value-wins; rare in practice for cpuminer.
+        m = _RE_HASHRATE.search(line)
+        if m and "thread" not in line.lower():
+            new = float(m.group(1))
+            if new != stats.hashrate_khs:
+                stats.hashrate_khs = new
+                updated = True
 
     m = _RE_ACCEPTED.search(line)
     if m:
@@ -132,6 +168,8 @@ def parse_line(line: str, stats: MinerStats) -> bool:
             stats.rejected = new
             updated = True
 
+    # Standalone "thread N:" lines (e.g. binding messages) still update
+    # the thread count — but they won't fire if _RE_THREAD_RATE already did.
     m = _RE_THREAD.search(line)
     if m:
         new = int(m.group(1)) + 1
@@ -140,6 +178,27 @@ def parse_line(line: str, stats: MinerStats) -> bool:
             updated = True
 
     return updated
+
+
+def format_hashrate(khs: float) -> str:
+    """Render kh/s with appropriate unit scaling.
+
+    cpuminer always reports in kh/s; for SHA-256 on modern CPUs you're
+    seeing kilohash per second per thread — but the aggregate across 16
+    threads runs into the hundreds of thousands. Auto-scale up to Th/s
+    so the Dashboard reads sanely no matter the rig.
+    """
+    if khs <= 0:
+        return "—"
+    if khs < 1:
+        return f"{khs * 1000:.0f} H/s"
+    if khs < 1000:
+        return f"{khs:.2f} kh/s"
+    if khs < 1_000_000:
+        return f"{khs / 1000:.2f} Mh/s"
+    if khs < 1_000_000_000:
+        return f"{khs / 1_000_000:.2f} Gh/s"
+    return f"{khs / 1_000_000_000:.2f} Th/s"
 
 
 # ── Runner ────────────────────────────────────────────────────────────────
