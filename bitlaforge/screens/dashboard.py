@@ -34,7 +34,11 @@ class DashboardScreen(StatusMixin, Container):
 
     def compose(self) -> ComposeResult:
         with Vertical(classes="main-area"):
-            yield Label("⚡  BitlaForge — Miner Overview", classes="section-title")
+            yield Label(
+                "⚡  BitlaForge — Miner Overview",
+                id="dashboard-title",
+                classes="section-title",
+            )
             yield Static(id="dashboard-content")
 
     def on_mount(self) -> None:
@@ -48,8 +52,21 @@ class DashboardScreen(StatusMixin, Container):
     def _reload_view(self) -> None:
         """Render the dashboard content from live MinerStats off the app."""
         from ..miner_runner import MinerStats, find_minerd  # local imports avoid cycle
+        from ..config_manager import load_config  # local import: name lives in TOML
         stats: MinerStats = getattr(self.app, "miner_stats", MinerStats())
         minerd_path = find_minerd()
+
+        # G4 (v0.1.2): surface the miner name in the title so SSHing into a
+        # rig immediately tells you which one BitlaForge thinks it is.
+        miner_name = (load_config().get("miner_name") or "").strip()
+        if miner_name:
+            title = f"⚡  BitlaForge — Miner Overview — [bold #cba6f7]{miner_name}[/]"
+        else:
+            title = "⚡  BitlaForge — Miner Overview"
+        try:
+            self.query_one("#dashboard-title", Label).update(title)
+        except Exception:
+            pass
 
         # G3: persistent banner whenever the minerd binary isn't found on
         # PATH. Sits above everything else so it's the first thing the

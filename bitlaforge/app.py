@@ -70,6 +70,11 @@ class BitlaForgeApp(App):
             on_line=self._on_miner_line,
             on_stats=self._on_miner_stats,
         )
+        # G4 (v0.1.2): 1-second tick installed while mining so uptime ticks
+        # smoothly and the latest cached stats stay visible without waiting
+        # for the next minerd hashmeter line. Set to a Textual Timer when
+        # the miner is running, None otherwise.
+        self._tick_timer = None
 
     # Backwards-compat shim — the v0.1.0 skeleton exposed `miner_running`
     # as a bool. Anything still reading it gets the value off the live
@@ -176,6 +181,7 @@ class BitlaForgeApp(App):
         """
         if self._runner.is_running:
             await self._runner.stop()
+            self._stop_live_tick()
             self.notify("Miner stopped.", severity="information", timeout=4)
             return
 
@@ -206,6 +212,9 @@ class BitlaForgeApp(App):
         ok, msg = await self._runner.start(config)
         if ok:
             self.notify(f"Miner started — {msg}", severity="information", timeout=4)
+            # Install the 1-second Dashboard tick so uptime ticks smoothly
+            # between minerd hashmeter lines.
+            self._start_live_tick()
         else:
             self.notify(
                 f"Failed to start miner: {msg}",
@@ -224,6 +233,34 @@ class BitlaForgeApp(App):
     def _on_miner_stats(self, stats: MinerStats) -> None:
         """Store the latest stats snapshot and ask the Dashboard to repaint."""
         self.miner_stats = stats
+        try:
+            self.query_one("#dashboard")._reload_view()
+        except Exception:
+            pass
+        # If the minerd process exited on its own (parser sees no more
+        # output and flips running=False), the tick should also stop —
+        # otherwise we'd keep ticking an empty Dashboard forever.
+        if not stats.running and self._tick_timer is not None:
+            self._stop_live_tick()
+
+    # ── Live Dashboard tick (G4 v0.1.2) ───────────────────────────────────
+
+    def _start_live_tick(self) -> None:
+        """Install a 1-second timer that re-renders the Dashboard."""
+        if self._tick_timer is not None:
+            return  # already running
+        self._tick_timer = self.set_interval(1.0, self._on_tick)
+
+    def _stop_live_tick(self) -> None:
+        if self._tick_timer is not None:
+            try:
+                self._tick_timer.stop()
+            except Exception:
+                pass
+            self._tick_timer = None
+
+    def _on_tick(self) -> None:
+        """Re-render the Dashboard so uptime keeps ticking between events."""
         try:
             self.query_one("#dashboard")._reload_view()
         except Exception:
