@@ -56,6 +56,12 @@ class ConfigScreen(StatusMixin, Container):
                 classes="detail-muted",
             )
 
+            yield Label(
+                "Name  (local label + pool worker name, e.g. \"laptop-rig\")",
+                classes="field-label",
+            )
+            yield Input(placeholder="this-machine", id="config-miner-name")
+
             yield Label("Pool URL (host:port or stratum+tcp://…)", classes="field-label")
             yield Input(
                 placeholder="stratum+tcp://pool.example.com:3333",
@@ -72,8 +78,22 @@ class ConfigScreen(StatusMixin, Container):
                 value=_DEFAULT_ALGORITHM,
             )
 
-            yield Label("Thread count  (0 = auto-detect)", classes="field-label")
+            # G2: dynamic "of N available" hint — sourced from os.cpu_count()
+            # so the user immediately sees their ceiling.
+            from ..system_info import get_system_info
+            _cores_avail = get_system_info().logical_cores
+            yield Label(
+                f"Thread count  (0 = auto-detect, of {_cores_avail} available)",
+                classes="field-label",
+            )
             yield Input(placeholder="0", id="config-threads")
+
+            yield Label(
+                "Niceness  (0 = normal priority, 19 = lowest — recommended for "
+                "background mining)",
+                classes="field-label",
+            )
+            yield Input(placeholder="19", id="config-niceness")
 
             with Horizontal(classes="config-buttons"):
                 yield Button("Save",         id="btn-save",  classes="primary")
@@ -100,17 +120,21 @@ class ConfigScreen(StatusMixin, Container):
 
     def _populate_inputs(self) -> None:
         """Push current config values into the input widgets."""
-        self.query_one("#config-pool",      Input).value = self._config["pool"]
-        self.query_one("#config-wallet",    Input).value = self._config["wallet"]
-        self.query_one("#config-threads",   Input).value = self._config["threads"]
-        self.query_one("#config-algorithm", Select).value = self._config["algorithm"]
+        self.query_one("#config-miner-name", Input).value = self._config.get("miner_name", "")
+        self.query_one("#config-pool",       Input).value = self._config["pool"]
+        self.query_one("#config-wallet",     Input).value = self._config["wallet"]
+        self.query_one("#config-threads",    Input).value = self._config["threads"]
+        self.query_one("#config-niceness",   Input).value = self._config.get("niceness", "19")
+        self.query_one("#config-algorithm",  Select).value = self._config["algorithm"]
 
     def _read_inputs(self) -> dict:
         return {
-            "pool":      self.query_one("#config-pool",    Input).value.strip(),
-            "wallet":    self.query_one("#config-wallet",  Input).value.strip(),
-            "threads":   self.query_one("#config-threads", Input).value.strip() or "0",
-            "algorithm": str(self.query_one("#config-algorithm", Select).value or _DEFAULT_ALGORITHM),
+            "miner_name": self.query_one("#config-miner-name", Input).value.strip(),
+            "pool":       self.query_one("#config-pool",       Input).value.strip(),
+            "wallet":     self.query_one("#config-wallet",     Input).value.strip(),
+            "threads":    self.query_one("#config-threads",    Input).value.strip() or "0",
+            "niceness":   self.query_one("#config-niceness",   Input).value.strip() or "19",
+            "algorithm":  str(self.query_one("#config-algorithm", Select).value or _DEFAULT_ALGORITHM),
         }
 
     def on_button_pressed(self, event: Button.Pressed) -> None:
@@ -156,10 +180,12 @@ class ConfigScreen(StatusMixin, Container):
                 title="Save Miner Configuration",
                 message=(
                     f"Save these settings?\n"
+                    f"  name: {new_config['miner_name']}\n"
                     f"  pool: {new_config['pool']}\n"
                     f"  wallet: {new_config['wallet']}\n"
                     f"  algorithm: {new_config['algorithm']}\n"
-                    f"  threads: {new_config['threads']}"
+                    f"  threads: {new_config['threads']}\n"
+                    f"  niceness: {new_config['niceness']}"
                 ),
             ),
             on_confirm,

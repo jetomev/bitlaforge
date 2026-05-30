@@ -15,6 +15,7 @@ Read uses ``tomllib`` (Python 3.11+ stdlib). Write uses ``tomli_w``
 
 from __future__ import annotations
 
+import socket
 import tomllib
 from pathlib import Path
 
@@ -25,11 +26,23 @@ CONFIG_DIR = Path.home() / ".config" / "bitlaforge"
 CONFIG_PATH = CONFIG_DIR / "config.toml"
 
 
+def _default_miner_name() -> str:
+    """Hostname makes a decent default — already meaningful when SSH-ing
+    into a rig, and users with multiple BitlaForge instances will typically
+    have distinct hostnames anyway."""
+    try:
+        return socket.gethostname() or ""
+    except OSError:
+        return ""
+
+
 DEFAULT_CONFIG: dict[str, str] = {
-    "pool":      "",
-    "wallet":    "",
-    "algorithm": "sha256d",
-    "threads":   "0",   # 0 = let minerd auto-detect
+    "pool":       "",
+    "wallet":     "",
+    "algorithm":  "sha256d",
+    "threads":    "0",     # 0 = let minerd auto-detect
+    "miner_name": _default_miner_name(),  # local label + pool worker name
+    "niceness":   "19",    # 0 = normal; 19 = lowest priority (mining default)
 }
 
 
