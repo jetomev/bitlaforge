@@ -1,0 +1,191 @@
+.\" bitlaforge.1 — BitlaForge man page
+.\" GNU GPL v3 — see LICENSE
+.TH BITLAFORGE 1 "May 2026" "BitlaForge v0.1.3" "User Commands"
+.
+.SH NAME
+bitlaforge \- terminal UI for running solo Bitcoin mining (the lottery)
+.
+.SH SYNOPSIS
+.B bitlaforge
+.
+.SH DESCRIPTION
+.B BitlaForge
+is a Catppuccin Mocha\(emthemed terminal UI that wraps
+.BR minerd (1)
+for
+.B solo
+Bitcoin mining. Solo mining at the current Bitcoin network difficulty is,
+statistically, a
+.B lottery
+\(em the chance of finding a block on a single CPU in any given minute is
+vanishingly small, but if you do hit, you take the full block reward.
+
+BitlaForge is the dashboard you watch while your machine buys lottery tickets
+in compute cycles. It launches
+.BR minerd ,
+parses its stdout, and surfaces pool / wallet / threads / hashrate /
+accepted / rejected / uptime so you don't need to keep a terminal window
+staring at raw output. It also runs cleanly over SSH, which is the natural
+environment for a headless mining rig.
+
+It is part of the
+.B Forge
+suite for KognogOS \(em alongside
+.BR grubforge (1),
+.BR alacrittyforge (1),
+and nogForge.
+
+BitlaForge writes only to your user-space config at
+.IR ~/.config/bitlaforge/config.toml ;
+no root privileges are required to run, configure, or mine.
+
+The application is organised around four screens, switchable from the sidebar
+or with the number keys:
+.TP
+.B 1 \(em Dashboard
+Read-only overview: miner state, pool + port, wallet, algorithm, threads,
+hashrate, uptime, shares (accepted / rejected), per-process minerd CPU% and
+RAM. Uptime ticks live every second while mining.
+.TP
+.B 2 \(em Log
+Streaming view of minerd's stdout, line-by-line, in a 5,000-line bounded
+buffer with search filter and auto-scroll.
+.TP
+.B 3 \(em Config
+Pool URL, wallet address, miner name (used as Stratum worker label),
+algorithm, thread count, niceness.
+.TP
+.B 4 \(em Setup
+System info (CPU model, logical/physical cores, memory, load average),
+minerd install status, AUR install guidance for each cpuminer variant,
+and a "test minerd" action that runs
+.B minerd --version.
+.
+.SH KEYBINDINGS
+.SS Global (any screen)
+.TP
+.B 1 .. 4
+Switch to the corresponding screen.
+.TP
+.B M
+Start / stop the
+.B minerd
+subprocess. Stop is SIGTERM with a 3-second grace period; falls back to
+SIGKILL if minerd ignores it. If minerd is not on PATH, M surfaces
+install-guidance instead of attempting to spawn.
+.TP
+.B R
+Refresh the current screen's view (re-read disk, re-poll /proc, etc).
+.TP
+.B ?
+Toggle the help overlay (press again, or Esc, q, or ? to close).
+.TP
+.B q
+Quit.
+.
+.SS Log screen
+.TP
+.B /
+Focus the search filter input.
+.TP
+.B C
+Clear the log buffer.
+.
+.SS Config screen
+.TP
+.B E
+Focus the first input (begin editing).
+.TP
+.B S
+Save the current values to
+.IR ~/.config/bitlaforge/config.toml .
+A confirm dialog summarises the changes; Esc cancels, Enter confirms.
+.
+.SS Setup screen
+.TP
+.B T
+Run
+.B minerd --version
+and surface the result in the status line.
+.
+.SH SAFETY
+Mining draws real CPU and electricity. BitlaForge is built around
+.B opt-in:
+.IP \(bu 2
+.B Never auto-start.
+The miner only runs after an explicit M press.
+.IP \(bu 2
+.B Always visible.
+The Dashboard's "Miner state" header always shows whether minerd is
+running.
+.IP \(bu 2
+.B One-keystroke stop.
+M toggles. The Stop path is never more than one key away.
+.IP \(bu 2
+.B Niceness defaults to 19
+(lowest priority). The system stays responsive even while mining \(em
+verified live by the Dashboard's minerd CPU% readout (the percentage
+visibly drops when other workloads compete for cycles).
+.
+.SH FILES
+.TP
+.I ~/.config/bitlaforge/config.toml
+Persistent miner configuration (pool, wallet, algorithm, threads, name,
+niceness). Created on first save.
+.TP
+.I /usr/lib/bitlaforge/
+Installed Python package + launcher (managed by pacman).
+.TP
+.I /usr/share/licenses/bitlaforge/LICENSE
+GPL v3 license text.
+.
+.SH DEPENDENCIES
+.B Runtime:
+.RS
+.IP \(bu 2
+python \(>= 3.11
+.IP \(bu 2
+python-textual \(>= 8.2.7
+.IP \(bu 2
+python-rich
+.IP \(bu 2
+python-tomli-w
+.RE
+.PP
+.B Optional (required to actually mine):
+.RS
+.IP \(bu 2
+.B cpuminer
+(AUR \(em pooler's original, recommended)
+.IP \(bu 2
+.B cpuminer-multi
+(AUR \(em multi-algo fork)
+.IP \(bu 2
+.B cpuminer-opt
+(AUR \(em heavily optimised variant)
+.RE
+.PP
+All cpuminer variants provide
+.IR /usr/bin/minerd .
+BitlaForge calls whichever one is on PATH. Press
+.B 4
+inside the app to see install guidance.
+.
+.SH AUTHORS
+Co-developed by Javier
+.RB ( jetomev )
+and Claude (Anthropic). BitlaForge is the fourth tool in the
+.B Forge
+suite, joining grubForge, alacrittyForge, and nogForge in shipping with
+KognogOS \(em a public demonstration that AI is a serious software
+collaborator on real, polished, end-user projects.
+.
+.SH COPYRIGHT
+Copyright \(co 2026 Javier (jetomev). License: GNU GPL v3. This is free
+software; see the source for copying conditions. There is NO warranty.
+.
+.SH SEE ALSO
+.BR minerd (1),
+.BR cpuminer (1),
+.BR grubforge (1),
+.BR alacrittyforge (1)

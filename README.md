@@ -6,7 +6,8 @@
 ![Platform: Linux](https://img.shields.io/badge/Platform-Linux-lightgrey.svg)
 ![Python: 3.11+](https://img.shields.io/badge/Python-3.11+-green.svg)
 ![Status: Alpha](https://img.shields.io/badge/Status-Alpha-orange.svg)
-![Version: 0.1.2](https://img.shields.io/badge/Version-0.1.2-purple.svg)
+![Version: 0.1.3](https://img.shields.io/badge/Version-0.1.3-purple.svg)
+[![AUR](https://img.shields.io/aur/version/bitlaforge)](https://aur.archlinux.org/packages/bitlaforge)
 
 ---
 
@@ -56,7 +57,13 @@ It is the fourth tool in the **Forge suite** for KognogOS — alongside [grubFor
 
 ## Installation
 
-### From source (Arch)
+### Arch Linux — AUR (recommended)
+```bash
+yay -S bitlaforge
+```
+Then run `bitlaforge`. The AUR package's `optdepends` will prompt for one of the `cpuminer*` variants to actually mine — install whichever fits your needs (see **Setup** screen for guidance).
+
+### Arch Linux — from source
 ```bash
 sudo pacman -S python-textual python-rich python-tomli-w
 git clone https://github.com/jetomev/bitlaforge.git
@@ -72,12 +79,18 @@ cd bitlaforge
 python main.py
 ```
 
-To actually mine, also install `minerd` via the AUR (see the Setup screen):
+### `minerd` itself (required to actually mine)
+The `minerd` binary lives only on the AUR — three providers, pick one. Press **4** inside BitlaForge for the full guide; the short version:
+
 ```bash
-yay -S cpuminer
+yay -S cpuminer          # pooler's original (recommended)
+# or
+yay -S cpuminer-multi    # multi-algorithm fork
+# or
+yay -S cpuminer-opt      # heavily optimised variant
 ```
 
-AUR submission lands with v0.1.3 — once there's real mining behavior to verify, the Forge release machinery (testing/, man page, hardened-`check()` PKGBUILD) goes up.
+If `minerd` is missing, BitlaForge still runs — the Dashboard shows a banner, the Setup screen has the install commands, and pressing **M** surfaces install-guidance instead of failing silently.
 
 ---
 
@@ -165,7 +178,7 @@ Mining is **opt-in**. Real CPU load, real electricity, real heat. BitlaForge wil
 - [x] Runtime `which("minerd")` check + Dashboard banner + friendly install guidance
 - [x] Setup screen with AUR provider list + `minerd --version` self-test
 
-### v0.1.2 — May 29, 2026 (current)
+### v0.1.2 — May 29, 2026
 - [x] System info on Setup screen (CPU model + logical/physical cores + load avg + memory) from stdlib
 - [x] Config gains **miner name** (default hostname; also used as Stratum worker name) and **niceness** (0–19, default 19)
 - [x] Threads input shows "of N available" hint from `os.cpu_count()`
@@ -173,26 +186,52 @@ Mining is **opt-in**. Real CPU load, real electricity, real heat. BitlaForge wil
 - [x] Dashboard live tick (1s `set_interval` while mining) — uptime advances smoothly between hashmeter lines
 - [x] Miner name surfaced in the Dashboard title
 - [x] Live `minerd` CPU% / RAM from `/proc/<pid>/stat` + `/proc/<pid>/status` — makes the niceness setting observable
+- [x] Hashrate parser hotfix: integer rates, per-thread aggregate, auto-scale to Mh/s / Gh/s
 
-### v0.1.3 — Planned
-- [ ] Start-miner pre-flight beyond pool+wallet (validate wallet format, optionally TCP-probe the pool)
-- [ ] Persistent log archive (rotating files in `~/.local/share/bitlaforge/`)
-- [ ] Per-session uptime / share totals across restarts
+### v0.1.3 — May 29, 2026 (current) — **first AUR release**
+- [x] `testing/RELEASE-CHECKLIST.md` + v0.1.3 Test Matrix
+- [x] Man page `bitlaforge.1`
+- [x] PKGBUILD with hardened headless-mount `check()` + `PYTHONDONTWRITEBYTECODE=1` defenses
+- [x] **Published on the AUR** — completes the Forge suite (joining grubForge, alacrittyForge, nogForge)
 
-### v0.1.4 — Planned (Forge release machinery + AUR)
-- [ ] `testing/` (RELEASE-CHECKLIST + Test Matrix + dogfood Test Results)
-- [ ] Man page `bitlaforge.1`
-- [ ] PKGBUILD with hardened headless-mount `check()` + `optdepends` listing the cpuminer variants
-- [ ] First AUR submission
+### v0.1.4 — Planned
+- [ ] Wallet format validation (bech32 / legacy address shape check)
+- [ ] Pool reachability probe (TCP connect with short timeout) + "Test connection" on Config
+- [ ] Persistent log archive (rotating files in `~/.local/share/bitlaforge/sessions/`)
+- [ ] Per-session lifetime totals across restarts (uptime + accepted/rejected accumulated)
+
+### v0.2.0 — Planned (visual identity upgrade)
+- [ ] Sparkline (`▁▂▃▄▅▆▇█`) of hashrate-over-time under the Dashboard's hashrate value
+- [ ] System CPU load sparkline on Setup
+- [ ] Per-thread hashrate mini-bars
+- [ ] Optional `textual-plotext` integration for proper time-series charts (btop-style)
 
 ### Future
-- [ ] Hashrate graph (Textual chart widget)
-- [ ] Pool tester (TCP probe before saving)
-- [ ] Multi-config profiles (switch between pools / wallets / algorithms)
+- [ ] Pool reachability check on save (not just on start)
+- [ ] Multi-config profiles (switch between pools / wallets / algorithms with one key)
+- [ ] Optional auto-restart on minerd crash
+- [ ] Notification on accepted-share (rare event, worth surfacing prominently)
 
 ---
 
 ## Changelog
+
+### v0.1.3 — May 29, 2026
+**First AUR release — Forge release machinery.**
+
+The version that gets BitlaForge into the AUR alongside its three Forge siblings. With this release, the **complete Forge suite** (grubForge + alacrittyForge + nogForge + BitlaForge) is now installable on Arch via a single `yay -S <name>`.
+
+No code-feature changes vs. v0.1.2 — pure release machinery + packaging:
+
+- **`testing/`** — `RELEASE-CHECKLIST.md` mirroring the grubForge / alacrittyForge discipline (pre-dogfood snapshot, async-worker audit, `_render` shadowing audit, version sync gate, doc coverage, co-author credit gate, release-day flow). Plus the v0.1.3 Test Matrix covering the full v0.1.0 → v0.1.3 user-facing surface for the first AUR-ship dogfood.
+- **Man page `bitlaforge.1`** — full keybindings, safety section, dependency listing (`cpuminer` variants as optdeps), files, authors with co-developer credit.
+- **PKGBUILD** — `depends=(python python-textual python-rich python-tomli-w)`; `optdepends=()` for the three `cpuminer*` AUR providers (since `minerd` is itself AUR-only and pacman can't reference AUR packages in `depends`); hardened `check()` runs the headless `run_test()` mount smoke under `PYTHONDONTWRITEBYTECODE=1` with defensive `__pycache__` cleanup in `package()` so we never ship the `.pyc` install-conflict class that bit grubForge v1.0.2.
+- The two hotfixes from v0.1.2 (`cfe1010` CPU display + `e3e3091` hashrate parser) are folded forward into v0.1.3 — first tagged version that includes them.
+
+Now installable as:
+```bash
+yay -S bitlaforge
+```
 
 ### v0.1.2 — May 29, 2026
 **Resource awareness + live Dashboard.**
