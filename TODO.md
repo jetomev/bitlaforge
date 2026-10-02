@@ -30,7 +30,7 @@ After alacrittyForge. Rework bitlaForge onto forgekit 0.5.0 to match grubForge 2
 - [ ] Announce an accepted share loudly
 
 ## Housekeeping
-- [ ] Naming drift: files and docs still say `BitlaForge`; the house name is `bitlaForge`. Fix as files are touched; a full rename (GitHub repo name is already lowercase `bitlaforge`) is Javier's call
+- [ ] **Naming drift (Javier, 2026-10-02: "the name bitlaForge needs fixing")**. GitHub done 10-02: the four old release titles and five release notes now say bitlaForge; forgekit's example app too (forgekit `3b647ec`). README, About and the repo name were already right. **Left, in the rework release:** what the app itself shows — dashboard title "⚡ BitlaForge — Miner Overview" (`screens/dashboard.py`), About name (`app.py`), the Install & Setup text (`setup_info.py`), module docstrings; and the AUR recipe's comment. Internal names (`BitlaForgeApp`) stay. The Vault folder is still `BitlaForge/`.
 - [ ] Vault: entries for v0.2.0 and v0.2.1 (August) are missing (only Part 1, June). Part of the Vault-review initiative
 
 ## Done (the two newest releases; full history in `docs/CHANGELOG.md`)
