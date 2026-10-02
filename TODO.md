@@ -2,6 +2,9 @@
 
 *The live work list and the handoff between sessions. Newest work first. Updated after every step.*
 
+## Next — the grubForge 2.0 look (Javier, 2026-10-02)
+After alacrittyForge. Rework bitlaForge onto forgekit 0.5.0 to match grubForge 2.0 ("so far the best of the 3"), with the same method: research, a screen-by-screen design Javier approves before code, build, tests (incl. 100 columns), his own run, release. Fold in the open items below (F-1 #3, #2 console) and the v0.3.0 dashboard ideas.
+
 ## Now
 - [x] Project kit completed: `CLAUDE.md` and this `TODO.md` (Javier, 2026-10-01: mandatory for every project). GitHub (README, About, topics, releases) and the AUR were already complete; the Vault folder exists
 - [ ] **F-1 · bitlaforge#3** · Esc does not take the cursor out of a Config field, so the next shortcut key is typed into it (found 2026-10-01 in forgekit's console-mode test; same in a normal terminal). Also: `E` focuses Pool URL while the Shortcuts window says "first field"
