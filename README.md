@@ -176,9 +176,9 @@ A human and AI collaboration. The 1.0 redesign was drawn screen by screen and ap
 
 Still on the plan from before 1.0:
 
-- [ ] Check that the pool can be reached when you save, not only when you start
-- [ ] Optionally restart the miner if it stops by itself
-- [ ] Switch between saved setups with one key
+- [ ] Check that the pool can be reached when you save, not only when you start ([#9](https://github.com/jetomev/bitlaforge/issues/9))
+- [ ] Optionally restart the miner if it stops by itself ([#10](https://github.com/jetomev/bitlaforge/issues/10))
+- [ ] Switch between saved setups with one key ([#11](https://github.com/jetomev/bitlaforge/issues/11))
 
 ### Done
 
