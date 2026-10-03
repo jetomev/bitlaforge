@@ -57,19 +57,20 @@ class ReadingOldFiles(Base):
 class Saving(Base):
     def test_only_changes_are_written_notes_stay(self):
         c = self.load(OLD)
-        c.set("threads", 4)
+        n = 1 if min(8, CORES) != 1 else 2               # a real change on any computer (VMs have 2 cores)
+        c.set("threads", n)
         c.set("heat_limit", 80)
-        self.assertEqual(c.changes(), [("Cores to use", f"{min(8, CORES)} of {CORES} cores", f"4 of {CORES} cores"),
+        self.assertEqual(c.changes(), [("Cores to use", f"{min(8, CORES)} of {CORES} cores", f"{n} of {CORES} cores"),
                                        ("Pause at", "85 °C", "80 °C")])
         c.save()
         text = self.path.read_text()
         self.assertIn("# my notes about mining", text)
         self.assertIn('algorithm = "sha256d"', text)       # a setting 1.0 doesn't use stays
-        self.assertIn("threads = 4", text)
+        self.assertIn(f"threads = {n}", text)
         self.assertIn("heat_limit = 80", text)
         self.assertIn('niceness = "0"', text)              # untouched settings keep their form
         self.assertEqual(c.change_count, 0)
-        self.assertEqual(Config.load(self.path).value("threads"), 4)
+        self.assertEqual(Config.load(self.path).value("threads"), n)
 
     def test_one_backup_per_save(self):
         c = self.load(OLD)
