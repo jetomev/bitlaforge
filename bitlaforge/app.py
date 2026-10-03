@@ -28,7 +28,7 @@ from forgekit import (
 )
 
 from . import __version__, backups, heat, history, odds
-from .miner import ALGORITHM, Event, Miner, find_minerd, read_line, speed
+from .miner import ALGORITHM, STOPPED_BY_ITSELF, Event, Miner, find_minerd, read_line, speed
 from .process_stats import compute_cpu_pct, read_process_sample
 from .settings import BY_KEY, Config
 from .ui.dashboard import DashboardScreen
@@ -349,8 +349,9 @@ class BitlaForgeApp(ForgeApp):
         st = self.miner.stats
         if not st.running and self._session is not None:
             self._finish_session()
-            self._note("info", f"stopped: {st.why_stopped}")
-            if st.why_stopped.startswith("the miner stopped by itself"):
+            code = f" (exit code {st.exit_code})" if st.exit_code else ""
+            self._note("problem" if code else "info", f"stopped: {st.why_stopped}{code}")
+            if st.why_stopped == STOPPED_BY_ITSELF:
                 self.notify("The miner stopped by itself. The Log shows its last words.",
                             title="Mining stopped", severity="warning", timeout=10)
         try:

@@ -158,7 +158,8 @@ class Lifecycle(unittest.IsolatedAsyncioTestCase):
     async def test_a_miner_that_ends_by_itself(self):
         await self.m.start(VALUES, stand_in(self.tmp, ["minerd: unknown algorithm -- 'x'"], "exit 1"))
         self.assertTrue(await self._wait(lambda: not self.m.stats.running))
-        self.assertIn("stopped by itself (code 1)", self.m.stats.why_stopped)
+        self.assertEqual(self.m.stats.why_stopped, "it stopped by itself")
+        self.assertEqual(self.m.stats.exit_code, 1)
 
     async def test_missing_miner(self):
         why = await self.m.start(VALUES, str(self.tmp / "nothing-here"))

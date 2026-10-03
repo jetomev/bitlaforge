@@ -39,11 +39,15 @@ class HistoryScreen(Vertical):
         rows = self.app.sessions()
         t = self.query_one(DataTable)
         t.clear()
+        live = self.app._session
         for r in rows:
+            if live is not None and r.started == live.started:      # being mined now
+                st = self.app.miner.stats
+                r = history.Session(r.started, st.seconds, st.average_khs, st.accepted, st.rejected, r.why)
             shares = f"{r.accepted}" + (f" {glyph('dash')} {r.rejected} rejected" if r.rejected else "")
             t.add_row(r.when.strftime("%b %-d  %H:%M"), history.duration(r.seconds),
                       speed(r.average_khs), shares, "mining now" if r.why == history.RUNNING else r.why)
-        tot = history.totals(rows)
+        tot = self.app.totals()
         m = "$forge-muted"
         if not rows:
             text = f"[{m}]No sessions yet. Each time you mine, the session is kept here.[/]"

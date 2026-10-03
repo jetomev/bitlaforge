@@ -26,6 +26,7 @@ from collections import deque
 from dataclasses import dataclass, field
 from typing import Callable
 
+STOPPED_BY_ITSELF = "it stopped by itself"
 ALGORITHM = "sha256d"          # Bitcoin's (Javier, 2 Oct: Bitcoin only)
 PROVIDERS = ("cpuminer",)      # the package that provides minerd on Arch (AUR)
 
@@ -125,6 +126,7 @@ class Stats:
     accepted: int = 0
     submitted: int = 0
     why_stopped: str = ""
+    exit_code: int | None = None     # when it stopped by itself
     minutes: deque = field(default_factory=lambda: deque(maxlen=30))  # speed, one per minute
     _sum: float = 0.0
     _n: int = 0
@@ -247,8 +249,9 @@ class Miner:
             except Exception:       # a screen failing must not stop the reading
                 pass
         code = await proc.wait()
-        if not self._stopping:     # it ended by itself
-            self._finish(f"the miner stopped by itself (code {code})" if code else "the miner stopped by itself")
+        if not self._stopping:     # it ended by itself; the code goes to the Log, the reason stays short
+            self.stats.exit_code = code
+            self._finish(STOPPED_BY_ITSELF)
 
     def _finish(self, why: str) -> None:
         if not self.stats.running:
