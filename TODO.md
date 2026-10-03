@@ -2,6 +2,8 @@
 
 *The live work list and the handoff between sessions. Newest work first. Updated after every step.*
 
+
+- [ ] **1.0 redesign, step 1 (2 Oct, 23:00): design page drawn, waiting on Javier's six answers** — https://claude.ai/artifact/Rtcb5HuMzYntERx5JoWxLj (version 1.0.0; Dashboard/Settings/Log/History; Bitcoin only; pause when hot 85 °C; lottery odds from mempool.space, switch to turn off; quit stops the miner). Checked on this desktop before drawing: **quitting leaves the miner running** (stand-in miner, still alive after Q); rejected shares never counted (cpuminer says "accepted: N/M … booooo"); "host:port" is read as http://; a broken config is replaced silently. No code written yet.
 ## Next — the grubForge 2.0 look (Javier, 2026-10-02)
 After alacrittyForge. Rework bitlaForge onto forgekit 0.5.0 to match grubForge 2.0 ("so far the best of the 3"), with the same method: research, a screen-by-screen design Javier approves before code, build, tests (incl. 100 columns), his own run, release. Fold in the open items below (F-1 #3, #2 console) and the v0.3.0 dashboard ideas.
 
