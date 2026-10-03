@@ -1,6 +1,6 @@
 # Installing the miner
 
-bitlaForge runs **minerd**, the program from the *cpuminer* project, which does the actual mining. It isn't installed with bitlaForge. Each way below was tested on 3 October 2026, in a fresh install of that distribution.
+bitlaForge runs **minerd**, the program from the *cpuminer* project, which does the actual mining. It isn't installed with bitlaForge. Each way below was tested on 2 October 2026, in a fresh install of that distribution.
 
 ## KognogOS and Arch Linux
 
