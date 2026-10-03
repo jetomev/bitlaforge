@@ -1,7 +1,6 @@
 """Settings: reading 0.2.x files, saving safely, never over a broken file.
 Every test works in a temporary folder. Run: python -m unittest discover tests"""
 
-import os
 import tempfile
 import unittest
 from pathlib import Path

@@ -1,4 +1,4 @@
-"""BitlaForge — per-process CPU/MEM readouts.
+"""bitlaForge — how much processor the miner uses.
 
 Reads ``/proc/<pid>/stat`` (for accumulated user/kernel ticks) and
 ``/proc/<pid>/status`` (for resident set size). Used by the App to

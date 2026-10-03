@@ -1,0 +1,313 @@
+<title>bitlaForge Screen Designs</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@400;700&display=swap">
+<style>
+/* Layout: one reading column; each screen = a short brief, a 100-column terminal drawing, then what it decides. Same family as the grubForge 2.0 design page. */
+:root {
+  --bg: #f6f5fa;
+  --fg: #23212e;
+  --muted: #5d5a70;
+  --rule: #dcd9e8;
+  --panel: #ffffff;
+  --accent: #6c4fc7;
+  --accent-soft: #ece6fb;
+  --warn-soft: #fbf1d9;
+  --warn-ink: #7a5300;
+  --bad-soft: #fbe3e6;
+  --bad-ink: #8a1d33;
+  --ok-ink: #1f6b3a;
+  --font-body: "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", "DejaVu Sans Mono", ui-monospace, monospace;
+  /* Terminal drawings use the app's own palette (Catppuccin Mocha) in both page themes. */
+  --t-base: #1e1e2e; --t-mantle: #181825; --t-crust: #11111b;
+  --t-s0: #313244; --t-s1: #45475a; --t-s2: #585b70; --t-ov: #7f849c;
+  --t-sub: #a6adc8; --t-text: #cdd6f4; --t-blue: #89b4fa; --t-mauve: #cba6f7;
+  --t-green: #a6e3a1; --t-yellow: #f9e2af; --t-red: #f38ba8; --t-peach: #fab387; --t-box: #2b4a7a;
+  /* Javier's KognogOS-theme, for the theme preview */
+  --k-bg: #1a1a1a; --k-fg: #cdd6f4; --k-cur: #f5e0dc; --k-pink: #f5c2e7; --k-teal: #94e2d5;
+  --k-white: #bac2de; --k-bblack: #585b70; --k-bwhite: #a6adc8;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #15141c; --fg: #e6e3f2; --muted: #a29fb8; --rule: #2e2c3d; --panel: #1d1b27;
+    --accent: #b9a3ff; --accent-soft: #2a2442; --warn-soft: #3a3020; --warn-ink: #f3d49a;
+    --bad-soft: #3a1e26; --bad-ink: #f6b3c2; --ok-ink: #9fe0b2;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #15141c; --fg: #e6e3f2; --muted: #a29fb8; --rule: #2e2c3d; --panel: #1d1b27;
+  --accent: #b9a3ff; --accent-soft: #2a2442; --warn-soft: #3a3020; --warn-ink: #f3d49a;
+  --bad-soft: #3a1e26; --bad-ink: #f6b3c2; --ok-ink: #9fe0b2;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--fg); font-family: var(--font-body); font-size: 17px; line-height: 1.55; padding: 0 16px; }
+.wrap { max-width: 1060px; margin: 0 auto; padding-block: 40px 80px; display: grid; gap: 56px; }
+.wrap > * { min-width: 0; }
+.prose { max-width: 68ch; }
+h1, h2, h3 { text-wrap: balance; line-height: 1.2; margin: 0; }
+h1 { font-size: clamp(30px, 5vw, 44px); letter-spacing: -0.01em; }
+h2 { font-size: 27px; }
+h3 { font-size: 19px; }
+p { margin: 0; }
+.stack { display: grid; gap: 14px; }
+.eyebrow { font-family: var(--font-mono); font-size: 12.5px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); }
+.lede { font-size: 19px; color: var(--muted); }
+code, kbd { font-family: var(--font-mono); font-size: 0.86em; }
+kbd { border: 1px solid var(--rule); border-bottom-width: 2px; border-radius: 4px; padding: 0 5px; background: var(--panel); white-space: nowrap; }
+a { color: var(--accent); }
+ul, ol { margin: 0; padding-left: 1.3em; display: grid; gap: 6px; }
+section { display: grid; gap: 20px; min-width: 0; }
+.toc { display: flex; flex-wrap: wrap; gap: 8px 18px; font-size: 15px; }
+.toc a { text-decoration: none; border-bottom: 1px solid var(--rule); }
+/* Terminal drawing */
+.term { background: var(--t-base); color: var(--t-text); border-radius: 8px; overflow-x: auto; border: 1px solid #2c2c3e; }
+.term pre { margin: 0; padding: 14px 16px; font-family: var(--font-mono); font-size: 12.6px; line-height: 1.42; white-space: pre; }
+.cap { font-size: 14.5px; color: var(--muted); }
+.m { color: var(--t-sub); } .d { color: var(--t-ov); } .a { color: var(--t-blue); } .v { color: var(--t-mauve); }
+.ok { color: var(--t-green); } .w { color: var(--t-yellow); } .er { color: var(--t-red); } .pc { color: var(--t-peach); }
+.b { font-weight: 700; } .u { text-decoration: underline; }
+.hdr { background: var(--t-crust); } .bar { background: var(--t-mantle); }
+.sel { background: var(--t-box); color: var(--t-text); } .fld { background: var(--t-s0); } .btn { background: var(--t-s1); color: var(--t-text); }
+.pri { background: var(--t-box); color: var(--t-text); font-weight: 700; } .act { background: var(--t-box); font-weight: 700; }
+.foc { background: var(--t-s0); outline: 1px solid var(--t-blue); }
+/* the theme preview, drawn in Javier's KognogOS-theme */
+.kt, .kg, .kbl, .kr, .ky, .kcur { background: var(--k-bg); }
+.kt { color: var(--k-fg); } .kg { color: var(--t-green); } .kbl { color: var(--t-blue); font-weight: 700; }
+.kr { color: var(--t-red); } .ky { color: var(--t-yellow); } .kcur { background: var(--k-cur); }
+.c0 { color: var(--k-bg); } .c1 { color: var(--t-red); } .c2 { color: var(--t-green); } .c3 { color: var(--t-yellow); }
+.c4 { color: var(--t-blue); } .c5 { color: var(--k-pink); } .c6 { color: var(--k-teal); } .c7 { color: var(--k-white); }
+.c8 { color: var(--k-bblack); } .c15 { color: var(--k-bwhite); }
+.k1a { color: var(--k-bg); text-shadow: 0 0 1px #777; } .kcd { color: var(--k-fg); } .kcu { color: var(--k-cur); }
+/* Console drawing: the 8-colour Linux console */
+.con { background: #000; border-color: #333; }
+.con pre { color: #c0c0c0; }
+.c-bl { background: #0000aa; color: #fff; } .c-cy { color: #55ffff; } .c-y { color: #ffff55; } .c-g { color: #55ff55; } .c-pri { background: #00aaaa; color: #000; }
+/* Tables */
+.tw { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-size: 15.5px; }
+th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--rule); vertical-align: top; }
+th { font-size: 13px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); font-weight: 700; }
+tr.grp th { color: var(--accent); padding-top: 18px; }
+td code { white-space: nowrap; }
+/* Decisions and notes */
+.decide { background: var(--accent-soft); border-radius: 10px; padding: 18px 20px; display: grid; gap: 10px; }
+.decide h3 { color: var(--accent); }
+.decide ol { gap: 12px; }
+.rec { font-weight: 700; }
+.note { background: var(--warn-soft); color: var(--warn-ink); border-radius: 8px; padding: 12px 16px; font-size: 15.5px; }
+.bad { background: var(--bad-soft); color: var(--bad-ink); border-radius: 10px; padding: 16px 20px; display: grid; gap: 10px; }
+.two { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 18px; }
+.two > * { min-width: 0; }
+.shot { margin: 0; display: grid; gap: 6px; }
+.shot img { width: 100%; border-radius: 8px; border: 1px solid var(--rule); display: block; }
+.shot figcaption { font-size: 14px; color: var(--muted); }
+.card { background: var(--panel); border: 1px solid var(--rule); border-radius: 10px; padding: 16px 18px; display: grid; gap: 8px; align-content: start; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+</style>
+
+<div class="wrap">
+
+<header class="stack">
+  <div class="eyebrow">bitlaForge · design proposal · 2 October 2026</div>
+  <h1>bitlaForge, screen by screen</h1>
+  <p class="lede prose">Every screen of the new bitlaForge, drawn before any code is written. Javier approved all six answers below on 2 October.</p>
+  <p class="prose">Your brief: <em>"rework alacrittyForge and bitlaForge to match the look of grubForge, so far the best of the 3."</em> bitlaForge is different from its sisters: it runs a program for hours (the miner) instead of editing a file. So it keeps a live Dashboard, and the grubForge look comes in through the Settings form, the changes bar, the hint line, a review before every save, and the manual inside the app. Every drawing is exactly <b>100 columns</b> wide. The numbers in them are today's real ones, checked on this computer at 22:55.</p>
+  <nav class="toc" aria-label="Contents">
+    <a href="#questions">Decided</a><a href="#repair">What today's version gets wrong</a><a href="#dashboard">Dashboard</a><a href="#settings">Settings</a><a href="#log">Log</a><a href="#history">History</a><a href="#quit">Quitting</a><a href="#keys">Keys</a><a href="#plan">How it gets built</a>
+  </nav>
+</header>
+
+<section id="questions">
+  <div class="decide">
+    <h3>Decided · Javier, 2 October</h3>
+    <ol>
+      <li><b>Version 1.0.0</b>, like alacrittyForge: a rebuilt app with tests, not a step from 0.2.1. <em>"Yes"</em></li>
+      <li><b>Four screens</b>: Dashboard, Settings, Log, and a new <b>History</b> that keeps every mining session between runs (today, all the numbers vanish the moment you stop). <em>"Love it!"</em></li>
+      <li><b>Bitcoin only.</b> The algorithm list shrinks from eight to one, sha256d. Six of today's eight can't run on the miner bitlaForge recommends, and this is a Bitcoin app. <em>"Bitcoin"</em></li>
+      <li><b>Pause when hot</b>, on by default at 85 °C: bitlaForge pauses the miner when the processor reaches it and resumes 5 °C lower. Today nothing watches the heat. <em>"Ok"</em></li>
+      <li><b>The lottery odds, honestly</b>: once an hour bitlaForge asks <code>mempool.space</code> how big the Bitcoin network is and shows your real chance. It sends nothing about you. A switch turns it off, and then no internet is used for this. <em>"Wow! I like it!"</em></li>
+      <li><b>Closing bitlaForge always stops the miner</b>, after asking. Today it keeps mining with nothing on screen (checked below). <em>"Sounds good!"</em></li>
+    </ol>
+  </div>
+</section>
+
+<section id="repair">
+  <h2>What today's version gets wrong</h2>
+  <p class="prose">I took stock of bitlaForge 0.2.1 first and checked the serious findings on this computer, with a stand-in for the miner so nothing was mined.</p>
+  <div class="bad">
+    <b>Found and checked</b>
+    <ul>
+      <li><b>Quitting leaves the miner running.</b> I started a stand-in miner from the app and pressed Q: the app closed, the miner kept going. On a real run your processor would keep working at full load with nothing on screen to stop it.</li>
+      <li><b>Rejected shares are never counted.</b> The miner reports a rejection as part of its "accepted: 37/38 (booooo)" line, and bitlaForge only looks for the word "rejected". It always shows 0.</li>
+      <li><b>The pool field's example is wrong.</b> It says "host:port" works. Without <code>stratum+tcp://</code> in front, the miner treats the address as a web address and never connects.</li>
+      <li><b>A broken settings file is replaced silently.</b> If it can't be read, bitlaForge starts from blank settings without a word, and the next Save overwrites it. No backup is kept.</li>
+    </ul>
+  </div>
+  <div class="two">
+    <div class="card"><b>Typed by hand</b><p>Pool address, wallet, thread count and priority, with no checks: "abc" threads or a mistyped wallet go straight to the miner.</p></div>
+    <div class="card"><b>Arch only, and not nog</b><p>The help says <code>yay -S cpuminer</code> and nothing about other distributions.</p></div>
+    <div class="card"><b>Out of date</b><p>No tests, no <code>--version</code>/<code>--help</code>, the old name "BitlaForge" on screen, colours and marks that don't show on a text console, Ctrl+C taken over, and the Log's "Auto-scroll" switch does nothing.</p></div>
+  </div>
+</section>
+
+<section id="dashboard">
+  <h2>1 · Dashboard</h2>
+  <p class="prose">"Is it mining, how fast, is it safe, what are my chances?" in four boxes, like grubForge's Overview. Your August ideas, the speed over time and a bar per core, are in the Speed box.</p>
+  <div class="term"><pre><span class="hdr"> <span class="v b">bitlaForge 1.0.0</span><span class="m"> · solo Bitcoin mining</span>                               <span class="m">tphome-linux · cpuminer 2.5.1</span> </span>
+<span class="bar"> <span class="act"> Dashboard </span>   S<span class="u">e</span>ttings    <span class="u">L</span>og    Histor<span class="u">y</span>   <span class="u">H</span>elp ▾  <span class="u">Q</span>uit                                            </span>
+                                                                                                    
+  <span class="a">╭─ Mining ────────────────────────────────────╮</span>  <span class="a">╭─ Speed ─────────────────────────────────────╮</span>  
+  <span class="a">│</span> <span class="ok b">●</span> <span class="b">Mining</span>  <span class="d">for 3 h 24 min</span>                    <span class="a">│</span>  <span class="a">│</span> <span class="b">184.3 Mh/s</span> <span class="d">now · average 183.9</span>              <span class="a">│</span>  
+  <span class="a">│</span>                                             <span class="a">│</span>  <span class="a">│</span> <span class="a">▃▅▆▇▇▆▇▇▆▇▇▇▆▇▇▇▇▆▇▇▇▇▇▆▇▇▇▇▇▇▆▇▇▇▇</span>         <span class="a">│</span>  
+  <span class="a">│</span> <span class="pri"> Stop mining  M </span>  <span class="btn"> Test the miner  T </span>       <span class="a">│</span>  <span class="a">│</span> <span class="d">the last 30 minutes</span>                         <span class="a">│</span>  
+  <span class="a">│</span>                                             <span class="a">│</span>  <span class="a">│</span>                                             <span class="a">│</span>  
+  <span class="a">│</span> <span class="d">Started by you at 19:34. bitlaForge never</span>   <span class="a">│</span>  <span class="a">│</span> <span class="d">Cores</span> <span class="a">▇▇▇▇▇▇▇▇▇▇▇▇▇▆▇▇</span> <span class="d">16 of 16 busy</span>        <span class="a">│</span>  
+  <span class="a">│</span> <span class="d">starts it on its own, and stops it when it</span>  <span class="a">│</span>  <span class="a">│</span> <span class="d">slowest core: 11.2 Mh/s · fastest 11.6</span>      <span class="a">│</span>  
+  <span class="a">│</span> <span class="d">closes.</span>                                     <span class="a">│</span>  <span class="a">│</span>                                             <span class="a">│</span>  
+  <span class="a">╰─────────────────────────────────────────────╯</span>  <span class="a">╰─────────────────────────────────────────────╯</span>  
+                                                                                                    
+  <span class="a">╭─ The lottery ───────────────────────────────╮</span>  <span class="w">╭─ Heat &amp; load ───────────────────────────────╮</span>  
+  <span class="a">│</span> <span class="m">A block today   </span> <span class="b">1 in 36 billion</span>            <span class="a">│</span>  <span class="w">│</span> <span class="m">Processor   </span> 72 °C <span class="d">· pauses at 85 °C</span>        <span class="w">│</span>  
+  <span class="a">│</span> <span class="m">A block this year</span> <span class="b">1 in 98 million</span>           <span class="a">│</span>  <span class="w">│</span> <span class="m">Miner uses  </span> 15.2 of 16 cores               <span class="w">│</span>  
+  <span class="a">│</span> <span class="m">Bitcoin network </span> 975 EH/s <span class="d">· mempool.space</span>   <span class="a">│</span>  <span class="w">│</span> <span class="m">Priority    </span> gentle <span class="d">· other programs first</span>  <span class="w">│</span>  
+  <span class="a">│</span> <span class="d">A block pays about 3.16 BTC. Almost no solo</span> <span class="a">│</span>  <span class="w">│</span> <span class="m">Shares      </span> <span class="ok">37 accepted</span> · 0 rejected       <span class="w">│</span>  
+  <span class="a">│</span> <span class="d">miner ever finds one: that&#x27;s the lottery.</span>   <span class="a">│</span>  <span class="w">│</span> <span class="d">             412 accepted since you started</span> <span class="w">│</span>  
+  <span class="a">╰─────────────────────────────────────────────╯</span>  <span class="w">╰─────────────────────────────────────────────╯</span>  
+                                                                                                    
+                                                                                                    
+<span class="hdr"> <span class="a">M</span> <span class="d">start / stop</span>  ·  <span class="a">T</span> <span class="d">test</span>  ·  <span class="a">1-4</span> <span class="d">screens</span>  ·  <span class="a">F1</span> <span class="d">help</span>  ·  <span class="a">?</span> <span class="d">all keys</span>                               </span></pre></div>
+  <p class="cap">Stopped, the Mining box says why the last session ended and what the next start will use (pool, cores); a missing miner, an empty wallet or an unreachable pool show there, with the button that fixes it. The miner only ever starts when you press M.</p>
+</section>
+
+<section id="settings">
+  <h2>2 · Settings</h2>
+  <p class="prose">A form like grubForge's, in three groups. The pool is picked from a list of solo pools (with "Other" for your own); the wallet is checked here, on your computer, before it is ever used.</p>
+  <div class="term"><pre><span class="hdr"> <span class="v b">bitlaForge 1.0.0</span><span class="m"> · solo Bitcoin mining</span>                               <span class="m">tphome-linux · cpuminer 2.5.1</span> </span>
+<span class="bar">  <span class="u">D</span>ashboard   <span class="act"> Settings </span>   <span class="u">L</span>og    Histor<span class="u">y</span>   <span class="u">H</span>elp ▾  <span class="u">Q</span>uit                                            </span>
+                                                                                                    
+ <span class="sel"> Pool &amp; wallet   </span> <span class="d">│</span> <span class="v b">Pool &amp; wallet</span>   <span class="d">where your mining goes, and who gets paid</span>                      
+  Miner             <span class="d">│</span>                                                                               
+  Safety            <span class="d">│</span> Pool            <span class="fld"> solo.ckpool.org · worldwide          ▼ </span>                      
+                    <span class="d">│</span>                 <span class="d">stratum+tcp://solo.ckpool.org:3333</span>                            
+                    <span class="d">│</span>                                                                               
+                    <span class="d">│</span> Wallet          <span class="fld"> bc1qcynj6qxwace8586h9fedekp6hdg7jk563fm96u </span>                  
+                    <span class="d">│</span>                 <span class="ok">✓ a valid Bitcoin address</span> <span class="d">· checked here, nothing</span>             
+                    <span class="d">│</span>                 <span class="d">is sent anywhere</span>                                              
+                    <span class="d">│</span>                                                                               
+                    <span class="d">│</span> Worker name     <span class="fld"> tphome-linux                         </span>                        
+                    <span class="d">│</span>                 <span class="d">shown on the pool&#x27;s page, to tell computers apart</span>             
+                                                                                                    
+                                                                                                    
+<span class="bar"> <span class="pc">●</span> <span class="pc">1 change not saved yet</span>                                                    <span class="pri"> Save…  F10 </span> <span class="btn"> Discard </span> </span>
+<span class="hdr"> <span class="a">↑↓</span> <span class="d">groups</span>  ·  <span class="a">Tab</span> <span class="d">settings</span>  ·  <span class="a">Enter</span> <span class="d">open list</span>  ·  <span class="a">F10</span> <span class="d">save</span>  ·  <span class="a">?</span> <span class="d">all keys</span>                         </span></pre></div>
+  <h3>The Miner and Safety groups</h3>
+  <div class="term"><pre><span class="hdr"> <span class="v b">bitlaForge 1.0.0</span><span class="m"> · solo Bitcoin mining</span>                               <span class="m">tphome-linux · cpuminer 2.5.1</span> </span>
+<span class="bar">  <span class="u">D</span>ashboard   <span class="act"> Settings </span>   <span class="u">L</span>og    Histor<span class="u">y</span>   <span class="u">H</span>elp ▾  <span class="u">Q</span>uit                                            </span>
+                                                                                                    
+  Pool &amp; wallet     <span class="d">│</span> <span class="v b">Miner</span>   <span class="d">how hard this computer works</span>                                          
+ <span class="sel"> Miner           </span> <span class="d">│</span>                                                                                
+  Safety            <span class="d">│</span> Algorithm       <span class="fld"> sha256d (Bitcoin)                    ▼ </span>                      
+                    <span class="d">│</span>                 <span class="d">only what your miner can do is listed</span>                         
+                    <span class="d">│</span>                                                                               
+                    <span class="d">│</span> Cores to use    <span class="fld"> 15 </span><span class="d"> of 16</span> <span class="btn"> 1 </span> <span class="btn"> 4 </span> <span class="btn"> 8 </span> <span class="pri"> 15 </span> <span class="btn"> 16 </span>                              
+                    <span class="d">│</span>                 <span class="d">leaving one free keeps the computer usable</span>                    
+                    <span class="d">│</span>                                                                               
+                    <span class="d">│</span> Priority        <span class="fld"> (•) Gentle   ( ) Normal </span>                                     
+                    <span class="d">│</span>                 <span class="d">gentle: other programs come first</span>                             
+                    <span class="d">│</span>                                                                               
+                    <span class="d">│</span> <span class="v b">Safety</span>   <span class="d">in its own group</span>                                                     
+                    <span class="d">│</span> Pause when hot  <span class="fld"> ● On  </span>  <span class="fld"> 85 </span><span class="d"> °C</span> <span class="btn"> 75 </span> <span class="btn"> 80 </span> <span class="pri"> 85 </span> <span class="btn"> 90 </span>                          
+                    <span class="d">│</span> Lottery odds    <span class="fld"> ● On  </span>  <span class="d">asks mempool.space for the network size</span>              
+<span class="hdr"> <span class="a">↑↓</span> <span class="d">groups</span>  ·  <span class="a">Tab</span> <span class="d">settings</span>  ·  <span class="a">←→</span> <span class="d">presets</span>  ·  <span class="a">F10</span> <span class="d">save</span>  ·  <span class="a">?</span> <span class="d">all keys</span>                              </span></pre></div>
+  <p class="cap">F10 shows every change, old &rarr; new, and saves with a backup first. A change made while mining takes effect at the next start, and the review says so. Your current file is kept as it is: its pool (<code>stratum.ckpool.org</code>) shows as "Other", and your 8 cores and normal priority stay.</p>
+</section>
+
+<section id="log">
+  <h2>3 · Log</h2>
+  <p class="prose">What the miner says, translated where it matters: accepted and rejected shares, connection trouble, pauses for heat. "Show" picks everything, only problems, or only shares.</p>
+  <div class="term"><pre><span class="hdr"> <span class="v b">bitlaForge 1.0.0</span><span class="m"> · solo Bitcoin mining</span>                               <span class="m">tphome-linux · cpuminer 2.5.1</span> </span>
+<span class="bar">  <span class="u">D</span>ashboard    S<span class="u">e</span>ttings   <span class="act"> Log </span>   Histor<span class="u">y</span>   <span class="u">H</span>elp ▾  <span class="u">Q</span>uit                                            </span>
+                                                                                                    
+  <span class="v b">Log</span>   <span class="d">what the miner says, newest at the bottom</span>                                                   
+                                                                                                    
+  <span class="d">Show</span> <span class="fld"> everything ▼ </span>  <span class="d">Find</span> <span class="fld">                    </span>  <span class="fld"> ● Follow new lines </span>                              
+                                                                                                    
+  <span class="a">╭──────────────────────────────────────────────────────────────────────────────────────────────╮</span>  
+  <span class="a">│</span> <span class="d">19:34:02</span>  <span class="m">Started: minerd -a sha256d -o stratum+tcp://solo.ckpool.org:3333 -t 15</span>             <span class="a">│</span>  
+  <span class="a">│</span> <span class="d">19:34:03</span>  <span class="ok">✓ connected to the pool</span>                                                            <span class="a">│</span>  
+  <span class="a">│</span> <span class="d">19:34:05</span>  <span class="m">thread 0: 11.52 Mh/s · thread 1: 11.48 Mh/s · … (15 threads)</span>                       <span class="a">│</span>  
+  <span class="a">│</span> <span class="d">19:41:17</span>  <span class="ok">✓ share accepted</span>  <span class="d">37 of 37 · 184.3 Mh/s</span>                                            <span class="a">│</span>  
+  <span class="a">│</span> <span class="d">19:58:40</span>  <span class="w">! share rejected</span>  <span class="d">37 of 38 · the pool said no, usually a stale share</span>               <span class="a">│</span>  
+  <span class="a">│</span> <span class="d">20:02:11</span>  <span class="w">! paused: the processor reached 85 °C</span>  <span class="d">resumes at 80 °C</span>                            <span class="a">│</span>  
+  <span class="a">│</span> <span class="d">20:03:30</span>  <span class="ok">✓ resumed</span>                                                                          <span class="a">│</span>  
+  <span class="a">╰──────────────────────────────────────────────────────────────────────────────────────────────╯</span>  
+                                                                                                    
+  <span class="btn"> Copy the log </span>  <span class="btn"> Clear </span>                                                                           
+                                                                                                    
+<span class="hdr"> <span class="a">/</span> <span class="d">find</span>  ·  <span class="a">F</span> <span class="d">follow on/off</span>  ·  <span class="a">C</span> <span class="d">clear</span>  ·  <span class="a">1-4</span> <span class="d">screens</span>  ·  <span class="a">?</span> <span class="d">all keys</span>                              </span></pre></div>
+</section>
+
+<section id="history">
+  <h2>4 · History</h2>
+  <p class="prose">New: every session, kept between runs, with why it stopped. A small file in bitlaForge's own folder; nothing leaves your computer.</p>
+  <div class="term"><pre><span class="hdr"> <span class="v b">bitlaForge 1.0.0</span><span class="m"> · solo Bitcoin mining</span>                               <span class="m">tphome-linux · cpuminer 2.5.1</span> </span>
+<span class="bar">  <span class="u">D</span>ashboard    S<span class="u">e</span>ttings    <span class="u">L</span>og   <span class="act"> History </span>  <span class="u">H</span>elp ▾  <span class="u">Q</span>uit                                            </span>
+                                                                                                    
+  <span class="v b">History</span>   <span class="d">every mining session, kept between runs</span>                                                 
+                                                                                                    
+  <span class="a">╭──────────────────────────────────────────────────────────────────────────────────────────────╮</span>  
+  <span class="a">│</span> <span class="a b">Started           Ran for     Average speed   Shares              Why it stopped    </span>         <span class="a">│</span>  
+  <span class="a">│</span> <span class="sel">Oct 2  19:34      3 h 24 m    183.9 Mh/s      37 · 1 rejected     you stopped it    </span>         <span class="a">│</span>  
+  <span class="a">│</span> Oct 1  22:10      9 h 02 m    181.2 Mh/s      96                  you stopped it             <span class="a">│</span>  
+  <span class="a">│</span> Sep 30 08:00      12 m        184.0 Mh/s      3                   bitlaForge closed          <span class="a">│</span>  
+  <span class="a">│</span> Sep 29 21:45      41 m        —               0                   pool unreachable           <span class="a">│</span>  
+  <span class="a">╰──────────────────────────────────────────────────────────────────────────────────────────────╯</span>  
+                                                                                                    
+  <span class="m">Since you started</span>   13 h 19 m mining · <span class="ok">412 shares accepted</span> · 4 rejected · best day Oct 1          
+  <span class="m">Blocks found</span>        none yet <span class="d">· the chance stays the same every second</span>                             
+                                                                                                    
+                                                                                                    
+<span class="hdr"> <span class="a">↑↓</span> <span class="d">pick</span>  ·  <span class="a">1-4</span> <span class="d">screens</span>  ·  <span class="a">F1</span> <span class="d">help</span>  ·  <span class="a">?</span> <span class="d">all keys</span>                                                 </span></pre></div>
+</section>
+
+<section id="quit">
+  <h2>Quitting while mining</h2>
+  <div class="term"><pre><span class="hdr"> <span class="v b">bitlaForge 1.0.0</span><span class="m"> · solo Bitcoin mining</span>                               <span class="m">tphome-linux · cpuminer 2.5.1</span> </span>
+<span class="bar"> <span class="act"> Dashboard </span>   S<span class="u">e</span>ttings    <span class="u">L</span>og    Histor<span class="u">y</span>   <span class="u">H</span>elp ▾  <span class="u">Q</span>uit                                            </span>
+                                                                                                    
+                                                                                                    
+                <span class="a">╭──────────────────────────────────────────────────────────────────╮</span>                
+                <span class="a">│</span>                                                                  <span class="a">│</span>                
+                <span class="a">│</span> <span class="w b">==&gt; The miner is running</span>                                         <span class="a">│</span>                
+                <span class="a">│</span>     Closing bitlaForge stops it, so your computer                <span class="a">│</span>                
+                <span class="a">│</span>     doesn&#x27;t keep mining with nothing on screen.                  <span class="a">│</span>                
+                <span class="a">│</span>                                                                  <span class="a">│</span>                
+                <span class="a">│</span>                     <span class="pri"> Stop mining and quit </span> <span class="btn"> Stay </span>                <span class="a">│</span>                
+                <span class="a">╰──────────────────────────────────────────────────────────────────╯</span>                
+                                                                                                    
+                                                                                                    
+                                                                                                    
+<span class="hdr"> <span class="a">Tab</span> <span class="d">buttons</span>  ·  <span class="a">Enter</span> <span class="d">choose</span>  ·  <span class="a">Esc</span> <span class="d">stay</span>                                                          </span></pre></div>
+  <p class="cap">Then the terminal gets the closing note every Forge app gives: what ran, for how long, the shares, where the run was logged, and a thank-you.</p>
+</section>
+
+<section id="keys">
+  <h2>Keys</h2>
+  <p class="prose">The family's keys: <b>1–4</b> screens, <b>Tab</b> moves, <b>F10</b> saves, <b>F1</b> help, <b>M</b> start/stop mining, <b>T</b> test the miner, <b>?</b> all keys, <b>Q</b> quit. Ctrl+C goes back to meaning "copy". The manual (in the Help menu) covers pools, wallets, the lottery maths, heat and every setting.</p>
+</section>
+
+<section id="plan">
+  <h2>How it gets built</h2>
+  <ol class="prose">
+    <li><b>The safe core first</b>, with tests: settings saved like alacrittyForge's (review, backup, one-step write, never over a broken file), the wallet check, the miner's start and stop (stops on quit), and reading its output correctly, rejected shares included.</li>
+    <li><b>The screens</b>, on forgekit 0.5.1, readable on a text console and at 100 columns.</li>
+    <li><b>Heat, odds and History.</b></li>
+    <li><b>Every distribution:</b> the miner is built in VMs of Ubuntu, Debian, Fedora and openSUSE, the way alacrittyForge's Alacritty was.</li>
+    <li><b>Your run</b>, with a written test matrix, including real mining on this computer. Then the release.</li>
+  </ol>
+</section>
+
+</div>

@@ -1,7 +1,8 @@
-"""BitlaForge — entry point."""
+"""bitlaForge — entry point."""
 
-from bitlaforge.app import BitlaForgeApp
+import sys
+
+from bitlaforge.cli import main
 
 if __name__ == "__main__":
-    app = BitlaForgeApp()
-    app.run()
+    sys.exit(main())

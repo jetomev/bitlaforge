@@ -1,5 +1,5 @@
-"""BitlaForge — TUI for solo Bitcoin mining (Forge suite for KognogOS)."""
+"""bitlaForge — solo Bitcoin mining, honestly framed (Forge Suite for KognogOS)."""
 
-__version__ = "0.2.1"
+__version__ = "1.0.0"
 __author__ = "jetomev"
 __license__ = "GPL-3.0"

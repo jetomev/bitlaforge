@@ -219,8 +219,9 @@ class Miner:
             return f"The miner couldn't start: {e.strerror or e}."
         self.stats = Stats(running=True, started=time.time())
         self._stopping = False
-        shown = " ".join(c if not c.startswith(values["wallet"]) else "WALLET" for c in cmd
-                         if c not in ("setpriv", "--pdeathsig", "TERM"))
+        shown = " ".join("WALLET" if c.startswith(values["wallet"]) else
+                         "minerd" if c == binary else c
+                         for c in cmd if c not in ("setpriv", "--pdeathsig", "TERM"))
         self.on_event(Event(time.strftime("%H:%M:%S"), "info", f"started: {shown}", shown))
         self._reader = asyncio.create_task(self._read())
         self.on_change()
