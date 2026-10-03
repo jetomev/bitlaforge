@@ -3,7 +3,13 @@
 *The live work list and the handoff between sessions. Newest work first. Updated after every step.*
 
 
-- [ ] **1.0 redesign, step 1 (2 Oct, 23:00): design page drawn, waiting on Javier's six answers** — https://claude.ai/artifact/Rtcb5HuMzYntERx5JoWxLj (version 1.0.0; Dashboard/Settings/Log/History; Bitcoin only; pause when hot 85 °C; lottery odds from mempool.space, switch to turn off; quit stops the miner). Checked on this desktop before drawing: **quitting leaves the miner running** (stand-in miner, still alive after Q); rejected shares never counted (cpuminer says "accepted: N/M … booooo"); "host:port" is read as http://; a broken config is replaced silently. No code written yet.
+- [x] **1.0 design approved (2 Oct, 23:10)**: all six answers yes ("Love it!", "Wow! I like it!") — https://claude.ai/artifact/Rtcb5HuMzYntERx5JoWxLj, issue #4. Findings opened: F-2 #5 quit leaves the miner running · F-3 #6 rejected never counted · F-4 #7 host:port never connects · F-5 #8 broken config replaced silently.
+- [ ] **1.0 build** (#4), in order, each with tests:
+  1. Safe core: settings file (review, backup, one-step write, never over a broken file), wallet check (bech32/base58 checksums, offline), pool list + Other (adds stratum+tcp://), miner start/stop (stops on quit), output parser on real cpuminer lines (rejected = total − accepted).
+  2. Screens on forgekit 0.5.1: Dashboard (4 boxes), Settings (Pool & wallet / Miner / Safety), Log, History; quit dialog; manual; --version/--help; closing note + run log; text console; 100 columns. Fixes #2, #3.
+  3. Heat pause (k10temp/coretemp via /sys/class/hwmon), lottery odds (mempool.space, hourly, switch), History file.
+  4. Distro VMs: the miner on Ubuntu, Debian, Fedora, openSUSE.
+  5. Javier's run with a written matrix, real mining on the desktop. Then release (version surfaces, AUR, issues closed).
 ## Next — the grubForge 2.0 look (Javier, 2026-10-02)
 After alacrittyForge. Rework bitlaForge onto forgekit 0.5.0 to match grubForge 2.0 ("so far the best of the 3"), with the same method: research, a screen-by-screen design Javier approves before code, build, tests (incl. 100 columns), his own run, release. Fold in the open items below (F-1 #3, #2 console) and the v0.3.0 dashboard ideas.
 
