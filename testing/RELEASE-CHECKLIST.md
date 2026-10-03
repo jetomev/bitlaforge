@@ -1,80 +1,75 @@
-# BitlaForge release checklist
+# bitlaForge release checklist
 
-Pre-flight gates that any cut (alpha or stable) must pass before tag + GitHub release + AUR push. Mirrors the grubForge / alacrittyForge release discipline; adapted for BitlaForge's external-process scope (wraps `minerd`).
+Gates every release must pass before the tag, the GitHub release and the AUR push. Mirrors grubForge's and alacrittyForge's; adapted for what bitlaForge does differently: it runs a long-lived program (`minerd`).
 
-## Pre-dogfood snapshot
+## Before any test on this desktop
 
-BitlaForge writes only to `~/.config/bitlaforge/config.toml` (user-space; no `/etc` writes). Snapshot it before testing so any change made during a dogfood pass is trivially reversible:
-
-```sh
-mkdir -p /tmp/bitlaforge-pretest
-cp -p ~/.config/bitlaforge/config.toml /tmp/bitlaforge-pretest/ 2>/dev/null || true
-sha256sum ~/.config/bitlaforge/config.toml > /tmp/bitlaforge-pretest/config.sha256 2>/dev/null || true
-```
-
-## External-process notes
-
-- `minerd` is **not** in official Arch repos — only on the AUR (`cpuminer`, `cpuminer-multi`, `cpuminer-opt`). Pacman dependency arrays can only reference official-repo packages, so minerd lives in `optdepends=()`, not `depends=()`. BitlaForge degrades gracefully via runtime `shutil.which("minerd")` checks + the Setup screen.
-- The headless mount smoke in PKGBUILD `check()` mounts the full Textual app under `run_test()` — it does NOT spawn `minerd` (no real mining at build time).
-- A dogfood with mining-on-real-hardware should be run before any v0.x.y → v0.x.(y+1) transition that touches `miner_runner.py`, the parser, or the subprocess lifecycle.
-
-## Async-worker pattern audit — `@work` and `run_worker` must not double-wrap
+bitlaForge writes only user files. Copy them aside first, so anything a test changes can be put back:
 
 ```sh
-grep -rn "@work"      bitlaforge/
-grep -rn "run_worker" bitlaforge/
-grep -rn "run_worker(self\.action_" bitlaforge/   # MUST be empty
+cp -p ~/.config/bitlaforge/config.toml ~/.config/bitlaforge/config.toml.before-X.Y.Z
 ```
 
-The third grep must return zero hits — a `run_worker(self.action_X())` where `action_X` is `@work`-decorated throws `WorkerError: Unsupported attempt to run an async worker` on newer Textual versions. (Background: this bug-class bit grubForge v1.0.0 in two screens.)
+History (`~/.local/share/bitlaforge/history.json`) and backups (`~/.config/bitlaforge/backups/`) only grow; nothing needs saving there.
 
-## `_render` shadowing audit (BitlaForge-specific)
+## Tests and warnings
 
 ```sh
-grep -rn "def _render(self" bitlaforge/   # MUST be empty
+PYTHONPATH=~/Programs/forgekit python -W default -m unittest discover tests
 ```
 
-Defining a `_render` method on any `Widget` subclass shadows Textual's internal `Widget._render()` and breaks the entire render pipeline with a cryptic `NoneType.render_strips` traceback. Always use `_redraw` instead. (Caught twice during BitlaForge v0.1.0 / v0.1.2; this audit makes the rule mechanical.)
+All pass, **report the count** (1.0.0: 64) and the warnings (1.0.0: 0). A drop in the count means a test was deleted silently. The AUR `check()` runs the same tests.
+
+## Every distribution
+
+`scripts/vm-distro-check.py` in the gf-* VMs (snapshot `fresh`), as in the 1.0.0 matrix §5: PASS on Debian, Ubuntu, Fedora and openSUSE. Debian/Ubuntu/Fedora need the cpuminer project's ready-made program first (the manual's *Installing the miner*); openSUSE `zypper install cpuminer`.
+
+## The miner (any release touching `miner.py`, the reader, or starting/stopping)
+
+- The miner's lines in `tests/test_miner.py` (`REAL`) are cpuminer's own; if a new cpuminer changes its wording, capture fresh lines first (`minerd --benchmark`, an unreachable pool), never guess.
+- After every headless run: `ps -C minerd -o pid --no-headers` must be empty.
+- Real mining on real hardware before the release (Javier's run).
+
+## Audits
+
+```sh
+grep -rn "run_worker(self\.action_" bitlaforge/   # MUST be empty (double-wrapped workers)
+grep -rn "def _render(self" bitlaforge/          # MUST be empty (shadows Textual's own)
+grep -rn "#[0-9a-fA-F]\{6\}" bitlaforge/ui bitlaforge/app.py   # MUST be empty: colours only through $forge-* roles
+```
+
+## Text console and 100 columns
+
+forgekit's `tools/console-preview.py --size 100x30` on all four screens: every character in the console font, every letter visible. The `*_100_columns_*` test covers widths.
 
 ## Version sync
 
-Before tagging, all of these must agree on the version string:
+All of these say the same version:
 
 - `bitlaforge/__init__.py` `__version__`
-- `README.md` Version badge
+- `README.md` Version badge (and, after the AUR push, the AUR badge's `?v=` cache-buster)
 - `bitlaforge.1` `.TH` header
-- `~/Programs/aur-bitlaforge/PKGBUILD` `pkgver` + `pkgrel`
-- AUR `.SRCINFO`
+- `~/Programs/aur-bitlaforge/PKGBUILD` `pkgver` + `pkgrel`, and `.SRCINFO` (`makepkg --printsrcinfo | diff - .SRCINFO`)
 
-## Doc coverage
+## Documentation
 
-- README and man page must list every binding in `app.py` `BINDINGS` + every screen `BINDINGS` (excluding `show=False` aliases).
-- `widgets/help_screen.py` must match the bindings actually defined. When a screen's `BINDINGS` changes, the help text changes with it.
-- Setup screen's AUR provider list must mention every currently-recommended `minerd` provider.
+- README top to bottom; roadmap and changelog newest first, the README keeping upcoming work and the two newest releases.
+- The man page and the manual (`bitlaforge/manual/`) list every key in `app.py` `BINDINGS`, `SHORTCUTS` and the Log's keys.
+- The manual's *Installing the miner* only carries ways tested in a fresh install.
+- Screenshots: `python docs/screenshots/generate.py` (a stand-in miner, an example wallet; never Javier's).
 
-## Co-author credit
+## Credit
 
-Every release artifact must carry the human + AI credit:
+The human + AI credit on every release artifact: the PKGBUILD co-developer line, the README Authors, the GitHub release body, the man page AUTHORS, and the co-author trailer on every commit.
 
-- `~/Programs/aur-bitlaforge/PKGBUILD` co-developer line
-- `README.md` Authors / Credits section
-- GitHub release body
-- Man page AUTHORS section
+## Release-day order
 
-## Release-day flow
-
-1. Pre-dogfood snapshot (above).
-2. Run the Test Matrix top to bottom; log findings if any.
-3. Land any hotfix batch closing in-scope findings (per-group commits, one release tag).
-4. Audit greps (above).
-5. Version sync (above).
-6. Local `makepkg -f` smoke (runs `check()` headless mount).
-7. `git tag vX.Y.Z` + `git push --tags`.
-8. GitHub release with notes.
-9. README sweep top to bottom (Description, Topics, README sections, Authors, Changelog).
-10. Bump AUR PKGBUILD; `updpkgsums`; `makepkg --printsrcinfo > .SRCINFO`.
-11. Local `sudo pacman -U` install smoke (or `makepkg -si`).
-12. `git push` to `ssh://aur@aur.archlinux.org/bitlaforge.git`.
-13. Verify public install path: `sudo pacman -R bitlaforge && yay -S bitlaforge` → smoke.
-14. Refresh GitHub repo About + Topics + AUR badge in README.
-15. Write end-of-day session log to vault with mandatory `## Next-session handoff (read this first)` section.
+1. Test Matrix and Results in `testing/` (`YYYYMMDD - Test Matrix for bitlaForge vX-Y-Z.md`); Javier's run.
+2. Tests, audits, console, version sync (above).
+3. Docs commit `docs: README + version bump for vX.Y.Z`; signed annotated tag; push `main` + tag.
+4. Signed release archive (`git archive` + `gpg --detach-sign --armor`); GitHub release with notes and a picture, Latest; download it back and `cmp`.
+5. AUR: `pkgver`, `sha256sums`, `.SRCINFO`; pre-flight (checksum, `gpg --verify`, `.SRCINFO` diff); build from the GitHub download; push (`SSH_AUTH_SOCK=/tmp/aur-agent.sock`); the AUR shows the version.
+6. README AUR badge cache-buster; check what GitHub serves.
+7. Close the release's issues with a full explanation; GitHub About and topics.
+8. Install the public package (`nog install bitlaforge`), `pacman -Q`.
+9. Memory, TODO, Vault.

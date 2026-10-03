@@ -1,6 +1,13 @@
-# BitlaForge — full roadmap history
+# bitlaForge — full roadmap history
 
 *The README carries the upcoming work and the two most recent releases; everything older lives here, newest-first.*
+
+### v0.2.0 — August 8, 2026 — the first Forge app on forgekit
+- [x] The hand-built menus, header, footer and dialogs were replaced by the shared foundation — about 400 fewer lines while gaining the suite's look
+- [x] Simplified to three sections, with real buttons on the Dashboard instead of a key legend
+- [x] The old Setup screen became a read-only **Help → Install & Setup** window that checks your system fresh each time
+- [x] Existing muscle memory kept working: `1-3`, `M`, `R`, `?`, `q`
+- [x] The whole mining engine carried over unchanged
 
 ### v0.1.3 — May 29, 2026 — **first AUR release**
 - [x] `testing/RELEASE-CHECKLIST.md` + v0.1.3 Test Matrix

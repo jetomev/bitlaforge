@@ -1,218 +1,171 @@
-.\" bitlaforge.1 — BitlaForge man page
+.\" bitlaforge.1 — bitlaForge man page
 .\" GNU GPL v3 — see LICENSE
-.TH BITLAFORGE 1 "August 2026" "BitlaForge v0.2.1" "User Commands"
+.TH BITLAFORGE 1 "October 2026" "bitlaForge v1.0.0" "User Commands"
 .
 .SH NAME
-bitlaforge \- terminal UI for running solo Bitcoin mining (the lottery)
+bitlaforge \- solo Bitcoin mining, honestly framed
 .
 .SH SYNOPSIS
 .B bitlaforge
+.br
+.B bitlaforge \-\-version
+.br
+.B bitlaforge \-\-help
 .
 .SH DESCRIPTION
-.B BitlaForge
-is a Catppuccin Mocha\(emthemed terminal UI that wraps
+.B bitlaForge
+is a keyboard-driven terminal application for solo Bitcoin mining as the
+lottery it is. It runs
 .BR minerd (1)
-for
-.B solo
-Bitcoin mining. Solo mining at the current Bitcoin network difficulty is,
-statistically, a
-.B lottery
-\(em the chance of finding a block on a single CPU in any given minute is
-vanishingly small, but if you do hit, you take the full block reward.
-
-BitlaForge is the dashboard you watch while your machine buys lottery tickets
-in compute cycles. It launches
-.BR minerd ,
-parses its stdout, and surfaces pool / wallet / threads / hashrate /
-accepted / rejected / uptime so you don't need to keep a terminal window
-staring at raw output. It also runs cleanly over SSH, which is the natural
-environment for a headless mining rig.
-
-It is part of the
-.B Forge
-suite for KognogOS \(em alongside
-.BR grubforge (1),
-.BR alacrittyforge (1),
-and nogForge.
-
-BitlaForge writes only to your user-space config at
-.IR ~/.config/bitlaforge/config.toml ;
-no root privileges are required to run, configure, or mine.
-
-Since v0.2.0 the interface is the shared
-.B forgekit
-shell: a top menu bar
-.RB ( Dashboard
-/
-.B Log
-/
-.B Config
-/
-.B Help
-/
-.BR Quit )
-with underlined accelerator letters, and three sections switchable from the
-menu or with the number keys:
-.TP
-.B 1 \(em Dashboard
-Live overview: miner state, pool + port, wallet, algorithm, threads,
-hashrate, uptime, shares (accepted / rejected), per-process minerd CPU% and
-RAM. Uptime ticks live every second while mining. Two action buttons:
-.B Start Miner
-(reads
-.B Stop Miner
-in red while the subprocess runs) and
-.B Test Miner
-(runs
-.B minerd --version
-and reports as a toast).
-.TP
-.B 2 \(em Log
-Streaming view of minerd's stdout, line-by-line, in a 5,000-line bounded
-buffer with search filter and auto-scroll.
-.TP
-.B 3 \(em Config
-Pool URL, wallet address, miner name (used as Stratum worker label),
-algorithm, thread count, niceness.
+from the cpuminer project, shows what it is doing in plain words, keeps every
+mining session, and shows the real chance of finding a block.
 .PP
-The former Setup screen lives on as the
-.B Help \(-> Install & Setup
-window: system info (CPU model, cores, memory, load average), minerd install
-status, AUR install guidance for each cpuminer variant, and paths \(em
-rebuilt fresh on every open.
+bitlaForge never starts mining on its own: only
+.B M
+or the Start button does, and only with a valid wallet. Closing bitlaForge
+stops the miner, after asking. The miner is started under
+.B setpriv \-\-pdeathsig TERM
+so that the system stops it if bitlaForge ends without a chance to.
+.PP
+Only Bitcoin is mined (the sha256d method). The wallet address is checked on
+the computer (Base58Check, bech32, bech32m); nothing is sent to check it.
+.PP
+No root privileges are needed. The full manual is inside the application
+(Help \(-> Manual, or
+.B F1
+on a setting) and in
+.I /usr/lib/bitlaforge/bitlaforge/manual/
+as Markdown.
+.
+.SH OPTIONS
+.TP
+.B \-\-version
+Print the version and exit.
+.TP
+.B \-\-help
+Print the usage and exit.
+.
+.SH SCREENS
+.TP
+.B 1 \- Dashboard
+Mining state and pool; speed now and on average, a chart of the last 30
+minutes and a bar per core; the chance of a block today and this year;
+processor temperature, the miner's processor use, priority and shares.
+.TP
+.B 2 \- Settings
+Pool & wallet (solo pools from a list, or Other; the wallet checked as it is
+typed; worker name), Miner (cores to use; Gentle or Normal priority), Safety
+(pause when hot and at what temperature; lottery odds).
+.TP
+.B 3 \- Log
+The miner's output, the important lines in plain words. Show: Important,
+Everything, Problems, Shares. The wallet is never shown.
+.TP
+.B 4 \- History
+Every mining session, kept between runs, with why it stopped, and the totals.
 .
 .SH KEYBINDINGS
-.SS Global (any section)
-.TP
-.B 1 .. 3
-Switch to the corresponding section.
-.TP
-.B Ctrl+<letter>
-Menu-bar accelerators \(em the underlined letter of each menu entry.
-Inside an open dropdown, an item's underlined letter selects it.
 .TP
 .B M
-Start / stop the
-.B minerd
-subprocess. Stop is SIGTERM with a 3-second grace period; falls back to
-SIGKILL if minerd ignores it. If minerd is not on PATH, M surfaces
-install-guidance instead of attempting to spawn.
+Start or stop mining.
 .TP
 .B T
-Test the miner \(em runs
-.B minerd --version
-and reports the result as a toast (same as the Dashboard's Test Miner
-button).
+Test the miner: 10 seconds on one core, without a pool.
+.TP
+.B 1 \(en 4 ", " Ctrl+letter
+Go to a screen.
+.TP
+.B Tab ", " Shift+Tab
+Next / previous field or button.
+.TP
+.B Enter
+Open a list, press a button, confirm.
+.TP
+.B Space
+Flip a switch.
+.TP
+.B Up ", " Down
+In a number: step through its presets.
+.TP
+.B Esc
+Close a window, or leave a field.
+.TP
+.B F10 ", " S
+Save settings, with a review first.
 .TP
 .B R
-Refresh the current section's view (re-read disk, re-poll /proc, etc).
+Read the settings file again; unsaved changes stay.
 .TP
-.B ? (or Ctrl+H)
-Toggle the Shortcuts window (press again, or Esc or q, to close).
+.B F1
+Help on what is selected.
 .TP
-.B q
-Quit.
-.
-.SS Log section
+.B / ", " F ", " C
+In the Log: find, follow on or off, clear.
 .TP
-.B /
-Focus the search filter input.
+.B ?
+All keys.
 .TP
-.B C
-Clear the log buffer.
-.
-.SS Config section
-.TP
-.B E
-Focus the first input (begin editing).
-.TP
-.B S
-Save the current values to
-.IR ~/.config/bitlaforge/config.toml .
-A confirm dialog summarises the changes; Esc cancels, Enter confirms.
-.
+.B Q ", " Ctrl+Q
+Quit; stops the miner, after asking.
 .
 .SH SAFETY
-Mining draws real CPU and electricity. BitlaForge is built around
-.B opt-in:
-.IP \(bu 2
-.B Never auto-start.
-The miner only runs after an explicit M press.
-.IP \(bu 2
-.B Always visible.
-The Dashboard's "Miner state" header always shows whether minerd is
-running.
-.IP \(bu 2
-.B One-keystroke stop.
-M toggles. The Stop path is never more than one key away.
-.IP \(bu 2
-.B Niceness defaults to 19
-(lowest priority). The system stays responsive even while mining \(em
-verified live by the Dashboard's minerd CPU% readout (the percentage
-visibly drops when other workloads compete for cycles).
+A save shows every change (old \(-> new), backs the file up first and writes
+it in one step; anything else in the file is kept. A settings file that cannot
+be read is never saved over; the newest backup is offered instead.
+.PP
+With Pause when hot on (the default), the miner is paused (SIGSTOP) when the
+processor reaches the limit (85 \(deC by default) and resumed (SIGCONT) 5
+\(deC lower. The temperature comes from the processor's own sensor
+(k10temp, zenpower, coretemp or cpu_thermal under
+.IR /sys/class/hwmon ).
+.PP
+With Lottery odds on (the default), mempool.space is asked once an hour for
+the network's difficulty and the last block's reward. Nothing about the user
+is sent.
 .
 .SH FILES
 .TP
 .I ~/.config/bitlaforge/config.toml
-Persistent miner configuration (pool, wallet, algorithm, threads, name,
-niceness). Created on first save.
+The settings. Read and written by bitlaForge.
 .TP
-.I /usr/lib/bitlaforge/
-Installed Python package + launcher (managed by pacman).
+.I ~/.config/bitlaforge/backups/
+Backups (the newest 20), each with a note saying why it was made.
 .TP
-.I /usr/share/licenses/bitlaforge/LICENSE
-GPL v3 license text.
+.I ~/.local/share/bitlaforge/history.json
+Every mining session.
+.TP
+.I ~/.local/share/bitlaforge/logs/
+One line per run, by day.
+.TP
+.I ~/.cache/bitlaforge/network.json
+The last answer from mempool.space.
 .
-.SH DEPENDENCIES
-.B Runtime:
-.RS
-.IP \(bu 2
-python \(>= 3.11
-.IP \(bu 2
-python-textual \(>= 8.2.7
-.IP \(bu 2
-python-rich
-.IP \(bu 2
-python-tomli-w
-.IP \(bu 2
-forgekit \(>= 0.2.0 (the shared Forge Suite TUI shell \(em
-https://github.com/jetomev/forgekit)
-.RE
-.PP
-.B Optional (required to actually mine):
-.RS
-.IP \(bu 2
-.B cpuminer
-(AUR \(em pooler's original, recommended)
-.IP \(bu 2
-.B cpuminer-multi
-(AUR \(em multi-algo fork)
-.IP \(bu 2
-.B cpuminer-opt
-(AUR \(em heavily optimised variant)
-.RE
-.PP
-All cpuminer variants provide
-.IR /usr/bin/minerd .
-BitlaForge calls whichever one is on PATH. Open
-.B Help \(-> Install & Setup
-inside the app to see install guidance.
-.
-.SH AUTHORS
-Co-developed by Javier
-.RB ( jetomev )
-and Claude (Anthropic). BitlaForge is the fourth tool in the
-.B Forge
-suite, joining grubForge, alacrittyForge, and nogForge in shipping with
-KognogOS \(em a public demonstration that AI is a serious software
-collaborator on real, polished, end-user projects.
-.
-.SH COPYRIGHT
-Copyright \(co 2026 Javier (jetomev). License: GNU GPL v3. This is free
-software; see the source for copying conditions. There is NO warranty.
+.SH REQUIREMENTS
+Linux; Python 3.11 or newer; python-textual, python-rich, python-tomlkit and
+python-forgekit 0.5.1 or newer; util-linux. To mine:
+.B minerd
+(the cpuminer package on Arch and openSUSE; elsewhere the cpuminer project's
+ready-made program, see the manual).
 .
 .SH SEE ALSO
 .BR minerd (1),
-.BR cpuminer (1),
-.BR grubforge (1),
-.BR alacrittyforge (1)
+.BR setpriv (1),
+.BR nice (1)
+.
+.SH AUTHORS
+.B jetomev
+\(em idea, vision, direction, testing
+.PP
+.B Claude (Anthropic)
+\(em co-developer, architecture, implementation
+.
+.SH LICENSE
+bitlaForge is free software: you can redistribute it and/or modify it under
+the terms of the GNU General Public License v3.0 as published by the Free
+Software Foundation.
+.PP
+See
+.I /usr/share/licenses/bitlaforge/LICENSE
+or
+.UR https://www.gnu.org/licenses/gpl-3.0.html
+.UE

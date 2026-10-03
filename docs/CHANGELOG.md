@@ -2,10 +2,22 @@
 
 *The README carries the two most recent entries; the complete history lives here, newest-first.*
 
+### v0.2.0 — August 8, 2026
+
+**The forgekit adoption.** bitlaForge became the first Forge app to move onto the shared foundation, and the one that road-tested it.
+
+The hand-rolled sidebar, header, footer, help screen and confirmation dialog — around 600 lines with their styling — were deleted. The menu bar, section switching, floating windows, theme and scrollbars all come from the shared library now.
+
+A same-day review then simplified the app itself. The Dashboard's list of keyboard hints became real buttons: a two-state **Start / Stop Miner** whose label and colour follow the actual process, and **Test Miner**. The Setup screen stopped being a section and became a Help window, rebuilt each time it opens so it always reflects reality. A "Miner" menu was considered and cut — actions belong where the state is, not in a menu.
+
+Everything that does the actual work carried over untouched: the miner process handling, statistics, system info, config storage, and the Log section. Your muscle memory kept working too.
+
+Net result: 406 fewer lines, and it looks like the rest of the suite.
+
 ### v0.1.3 — May 29, 2026
 **First AUR release — Forge release machinery.**
 
-The version that gets BitlaForge into the AUR alongside its three Forge siblings. With this release, the **complete Forge suite** (grubForge + alacrittyForge + nogForge + BitlaForge) is now installable on Arch via a single `yay -S <name>`.
+The version that gets bitlaForge into the AUR alongside its three Forge siblings. With this release, the **complete Forge suite** (grubForge + alacrittyForge + nogForge + bitlaForge) is now installable on Arch via a single `yay -S <name>`.
 
 No code-feature changes vs. v0.1.2 — pure release machinery + packaging:
 
@@ -22,7 +34,7 @@ yay -S bitlaforge
 ### v0.1.2 — May 29, 2026
 **Resource awareness + live Dashboard.**
 
-v0.1.1 made BitlaForge mine; v0.1.2 makes it feel alive while doing it. Five per-group commits, all stdlib (no new deps):
+v0.1.1 made bitlaForge mine; v0.1.2 makes it feel alive while doing it. Five per-group commits, all stdlib (no new deps):
 
 - **G1 — System info on Setup.** New `bitlaforge/system_info.py` reads `/proc/cpuinfo`, `/proc/meminfo`, `os.getloadavg()`, and `os.cpu_count()` into a `SystemInfo` dataclass. The Setup screen gains a block above the minerd status showing **CPU model**, **logical/physical cores**, **memory total/available with % used**, and **1/5/15-minute load averages** color-graded against your core count (green when comfortably idle, yellow as load approaches your ceiling, red over it). Refreshes on **R**.
 - **G2 — Config gains miner name + niceness + threads hint.** Two new fields in `~/.config/bitlaforge/config.toml`: `miner_name` (defaults to `socket.gethostname()`) and `niceness` (0–19, default 19). The Thread count label dynamically shows "of N available" sourced from the same `os.cpu_count()`. Forward-compatible: a v0.1.1 TOML loads cleanly with new defaults silently applied.
