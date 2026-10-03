@@ -5,7 +5,8 @@
 
 - [x] **1.0 design approved (2 Oct, 23:10)**: all six answers yes ("Love it!", "Wow! I like it!") — https://claude.ai/artifact/Rtcb5HuMzYntERx5JoWxLj, issue #4. Findings opened: F-2 #5 quit leaves the miner running · F-3 #6 rejected never counted · F-4 #7 host:port never connects · F-5 #8 broken config replaced silently.
 - [ ] **1.0 build** (#4), in order, each with tests:
-  1. Safe core: settings file (review, backup, one-step write, never over a broken file), wallet check (bech32/base58 checksums, offline), pool list + Other (adds stratum+tcp://), miner start/stop (stops on quit), output parser on real cpuminer lines (rejected = total − accepted).
+  1. ✅ **Safe core (2 Oct, ~23:50), 48 tests**: `wallet.py` (offline check, BIP173/350 vectors; Javier's saved wallet passes), `pools.py` (ckpool's 3 verified solo servers + Other; host:port → stratum+tcp://), `settings.py` + `backups.py` (reads 0.2.x text values; review/backup/one-step write; never over a broken file — 0.2.1 shown to erase the wallet), `miner.py` (real cpuminer 2.5.1 lines; rejected = T − A; stops on quit; `setpriv --pdeathsig TERM` stops it if bitlaForge dies — tested by killing a parent; heat pause = SIGSTOP/SIGCONT; a missing binary refused before spawning), `heat.py` (k10temp Tctl / coretemp package), `odds.py` (mempool.space hourly, cached), `history.py`. Old code still in place until step 2 replaces it.
+  - To ask Javier: his saved pool `stratum.ckpool.org` isn't one ckpool's solo page names (it names solo/eusolo/ausolo); unverified whether it's solo. Shows as "Other".
   2. Screens on forgekit 0.5.1: Dashboard (4 boxes), Settings (Pool & wallet / Miner / Safety), Log, History; quit dialog; manual; --version/--help; closing note + run log; text console; 100 columns. Fixes #2, #3.
   3. Heat pause (k10temp/coretemp via /sys/class/hwmon), lottery odds (mempool.space, hourly, switch), History file.
   4. Distro VMs: the miner on Ubuntu, Debian, Fedora, openSUSE.
