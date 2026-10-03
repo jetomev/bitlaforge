@@ -10,3 +10,5 @@ dist/
 # Local minerd output / scratch
 *.log
 *.pid
+dist-rc/
+logs/
