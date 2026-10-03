@@ -13,6 +13,8 @@
   5. ✅ **Javier's run (2 Oct 23:42–23:47): "done! so much better!"** — real mining 2 sessions (~160 Mh/s), quit while mining stopped it, 2 saves = 2 backups, pool switched to solo.ckpool.org himself, heat_limit 90. Results: `testing/20261002 - Test Results for bitlaForge v1-0-0.md` (Test/Log/console not in the on-disk evidence; ~3 min mined, not 10). Next: release, when Javier says go — README, man page rewrite, CHANGELOG/ROADMAP, RELEASE-CHECKLIST fix, version surfaces, tag, GitHub release, AUR, close #2–#8.
   6. ✅ **Released v1.0.0 (3 Oct, ~00:05)**: tag `v1.0.0` (docs `99fdd67`), GitHub Latest (asset byte-identical), AUR 1.0.0-1 (`f6bd612`, build ran 64 tests), badge `7e3981b`, About + topic `linux`, issues #2–#8 closed with explanations, backlog #9 #10 #11 linked from the README. Left: Javier's `nog install bitlaforge` (upgrade from 1.0.0rc1).
   - ~~Ask Javier about stratum.ckpool.org~~ — he switched to solo.ckpool.org in his run.
+
+- [ ] **Next version — button labels in Javier's format (3 Oct 2026):** "Words In Title Case (k)", e.g. "Review Updates (u)": the key in brackets after the words, for every Forge Suite app. What shipped stays until this app's next version.
 ## Next — the grubForge 2.0 look (Javier, 2026-10-02)
 After alacrittyForge. Rework bitlaForge onto forgekit 0.5.0 to match grubForge 2.0 ("so far the best of the 3"), with the same method: research, a screen-by-screen design Javier approves before code, build, tests (incl. 100 columns), his own run, release. Fold in the open items below (F-1 #3, #2 console) and the v0.3.0 dashboard ideas.
 
