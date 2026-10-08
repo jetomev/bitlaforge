@@ -1,10 +1,15 @@
-"""bitlaForge v1.0.0 — the app frame, on forgekit.
+"""bitlaForge v1.1.0 — the app frame, on forgekit.
 
 The frame is forgekit's (title bar, menu bar, changes bar, hint bar); the
 screens are bitlaForge's. Javier's rulings for 1.0.0 (2 Oct 2026,
 docs/design/v1.0.0-screens.html): four screens (Dashboard, Settings, Log,
 History); Bitcoin only; pause when hot; honest odds from mempool.space; and
 closing bitlaForge always stops the miner, after asking.
+
+1.1.0 (#13, Javier 8 Oct 2026): the menu keys come from forgekit 0.10.0 (Ctrl + the
+underlined letter and 1-5 for every menu entry, Help included); ``--hypeforge`` makes
+bitlaForge a page of hypeForge Settings (no Quit of its own); button labels read
+"Words in Title Case (k)", the key that presses them in brackets.
 """
 
 from __future__ import annotations
@@ -23,7 +28,7 @@ from textual.css.query import NoMatches
 from textual.widgets import Button, Static
 
 from forgekit import (
-    FORGE_CSS, GPL3_NOTICE, ChangeGroup, ForgeApp, ForgeModal, ManualScreen, Notice, ReviewDialog,
+    FORGE_CSS, GPL3_NOTICE, MENU_HINT, ChangeGroup, ForgeApp, ForgeModal, ManualScreen, Notice, ReviewDialog,
     SettingRow, load_pages,
 )
 
@@ -43,7 +48,7 @@ BF_CSS = FORGE_CSS + """
 #bf-dash { grid-size: 2 2; grid-columns: 1fr 1fr; grid-rows: auto auto; grid-gutter: 1 2; height: auto; padding: 0 2 0 0; }
 .bf-box { height: auto; border: round $forge-border; border-title-color: $forge-accent; border-title-style: bold; padding: 0 1; }
 .bf-box-buttons { padding: 1 0 0 0; align-horizontal: left; height: auto; }
-.bf-box-buttons Button { margin: 0 2 0 0; width: auto; min-width: 0; padding: 0 2; }
+.bf-box-buttons Button { margin: 0 2 0 0; width: auto; min-width: 0; padding: 0 1; }
 #db-fixes { padding: 0; }
 #bf-groups { width: 20; height: 1fr; border: none; border-right: solid $forge-border; background: $forge-bg; padding: 1 1 0 0; }
 #bf-settings-right { width: 1fr; height: 1fr; padding: 0 0 0 2; }
@@ -86,7 +91,7 @@ class QuitDialog(ForgeModal[str | None]):
             with Horizontal(classes="forge-buttons forge-panel-footer"):
                 for label, bid, primary in self._buttons:
                     yield Button(label, id=bid, variant="primary" if primary else "default")
-                yield Button("Stay", id="stay")
+                yield Button("Stay (Esc)", id="stay")
 
     def on_mount(self) -> None:
         self.query_one(f"#{self._buttons[0][1]}", Button).focus()
@@ -134,20 +139,18 @@ class BitlaForgeApp(ForgeApp):
         ("Space", "flip a switch"),
         ("↑↓ in a number", "step through its presets"),
         ("Esc", "close a window, or leave a field"),
-        ("1-4, Ctrl+letter", "go to a screen (the underlined letter)"),
+        ("1-5, Ctrl+letter", "go to a menu entry, Help included (Ctrl + its underlined letter)"),
         ("F10 or S", "save settings, with a review first"),
         ("R", "read the settings file again"),
         ("F1", "help on what is selected"),
         ("/  F  C", "in the Log: find, follow, clear"),
         ("?", "this list"),
-        ("Q or Ctrl+Q", "quit (stops the miner, after asking)"),
+        ("Q or Ctrl+Q", "quit (stops the miner, after asking); not there inside hypeForge Settings"),
     ]
-    HINTS = [("M", "start / stop"), ("1-4", "screens"), ("F10", "save"), ("F1", "help"), ("?", "all keys")]
+    HINTS = [("M", "start / stop"), MENU_HINT, ("F10", "save"), ("F1", "help"), ("?", "all keys")]
+    # 1.1.0: the numbers (1-5, Help included) and Ctrl + each underlined letter are
+    # forgekit's (0.10.0), made from MENU; only bitlaForge's own keys are here
     BINDINGS = [
-        Binding("1", "go('dashboard')", show=False), Binding("2", "go('settings')", show=False),
-        Binding("3", "go('log')", show=False), Binding("4", "go('history')", show=False),
-        Binding("ctrl+d", "go('dashboard')", show=False), Binding("ctrl+e", "go('settings')", show=False),
-        Binding("ctrl+l", "go('log')", show=False), Binding("ctrl+y", "go('history')", show=False),
         Binding("m", "toggle_mining", show=False), Binding("t", "test_miner", show=False),
         Binding("f10", "save", show=False, priority=True), Binding("s", "save", show=False),
         Binding("r", "reload", show=False),
@@ -240,9 +243,6 @@ class BitlaForgeApp(ForgeApp):
         self._sessions = None
 
     # ── navigation ───────────────────────────────────────────────────────────
-    def action_go(self, section: str) -> None:
-        self._switch_section(section)
-
     def on_section_shown(self, section_id: str) -> None:
         if section_id == "dashboard":
             self.query_one(DashboardScreen).refresh_view()
@@ -282,7 +282,7 @@ class BitlaForgeApp(ForgeApp):
         n, bar = self.config.change_count, self.changes_bar
         if n:
             bar.show(f"{n} change{'s' if n != 1 else ''} not saved yet", "changed",
-                     [("Save…  F10", "bf-save", True), ("Discard", "bf-discard", False)])
+                     [("Save Changes (s)", "bf-save", True), ("Discard Changes", "bf-discard", False)])
         else:
             bar.hide()
         self.query_one(DashboardScreen).refresh_view()
@@ -388,8 +388,11 @@ class BitlaForgeApp(ForgeApp):
             self._sample = now
         else:
             self.cpu_cores, self._sample = 0.0, None
-        if self.query_one("#forge-work").current == "sec-dashboard":
-            self.query_one(DashboardScreen).refresh_view()
+        try:
+            if self.query_one("#forge-work").current == "sec-dashboard":
+                self.query_one(DashboardScreen).refresh_view()
+        except NoMatches:              # bitlaForge is closing: the screens are gone (1.1.0)
+            pass
 
     def _heat_tick(self) -> None:
         self.temp = heat.processor_temp(self.hwmon)
@@ -435,7 +438,10 @@ class BitlaForgeApp(ForgeApp):
         if n is not None:
             self.network = n
             odds.save(n, self.network_cache)
-        self.query_one(DashboardScreen).refresh_view()
+        try:
+            self.query_one(DashboardScreen).refresh_view()
+        except NoMatches:              # the answer came while bitlaForge was closing
+            pass
 
     # ── the miner test: 10 seconds on one core, nothing sent anywhere ────────
     @work(exclusive=True, group="bf-test")
@@ -507,7 +513,7 @@ class BitlaForgeApp(ForgeApp):
             steps.append("The miner keeps running with the old settings; stop and start it to use these")
         choice = await self.push_screen_wait(ReviewDialog(
             "Review before saving", [ChangeGroup("Settings", path, c.changes())], steps=steps,
-            buttons=[("Save", "save", True)]))
+            buttons=[("Save (s)", "save", True)]))
         if choice is None:
             return
         try:
@@ -542,6 +548,10 @@ class BitlaForgeApp(ForgeApp):
 
     # ── quitting: the miner always stops ─────────────────────────────────────
     def before_quit(self) -> bool:
+        # also how hypeForge Settings closes bitlaForge (forgekit's host_quit): asked twice,
+        # the question is shown once
+        if isinstance(self.screen, QuitDialog):
+            return False
         n = self.config.change_count
         unsaved = [f"{n} settings change{'s are' if n != 1 else ' is'} not saved: quitting loses "
                    f"{'them' if n != 1 else 'it'}."] if n else []
@@ -549,12 +559,12 @@ class BitlaForgeApp(ForgeApp):
             self.push_screen(QuitDialog(
                 "The miner is running",
                 ["Closing bitlaForge stops it, so your computer doesn't keep mining with nothing on screen."]
-                + unsaved, [("Stop mining and quit", "stopquit", True)]), self._after_quit_choice)
+                + unsaved, [("Stop Mining and Quit", "stopquit", True)]), self._after_quit_choice)
             return False
         if n:
             self.push_screen(QuitDialog(f"{n} change{'s are' if n != 1 else ' is'} not saved",
                                         ["Quitting now loses them."],
-                                        [("Save first", "save", True), ("Quit without saving", "quit", False)]),
+                                        [("Save First", "save", True), ("Quit Without Saving", "quit", False)]),
                              self._after_quit_choice)
             return False
         return True

@@ -12,7 +12,7 @@ from textual.app import ComposeResult
 from textual.containers import Grid, Horizontal, Vertical, VerticalScroll
 from textual.widgets import Button, Static
 
-from forgekit import glyph
+from forgekit import MENU_HINT, glyph
 from forgekit.console import is_console
 
 from .. import history, odds, pools
@@ -21,6 +21,8 @@ from ..miner import speed
 from ..settings import CORES, GENTLE, words
 
 FINE = "▁▂▃▄▅▆▇█"
+# 1.1.0 (Javier, 3 Oct 2026): "Words in Title Case (k)", the key that presses it in brackets
+START, STOP = "Start Mining (m)", "Stop Mining (m)"
 CONSOLE = "░▒▓█"
 
 
@@ -46,19 +48,19 @@ def ago(seconds: float) -> str:
 
 
 class DashboardScreen(VerticalScroll, can_focus=False):
-    FORGE_HINTS = [("M", "start / stop"), ("T", "test"), ("1-4", "screens"), ("F1", "help"), ("?", "all keys")]
+    FORGE_HINTS = [("M", "start / stop"), ("T", "test"), MENU_HINT, ("F1", "help"), ("?", "all keys")]
 
     def compose(self) -> ComposeResult:
         with Grid(id="bf-dash"):
             with Vertical(classes="bf-box", id="box-mining"):
                 yield Static("", id="db-mining")
                 with Horizontal(classes="forge-buttons bf-box-buttons"):
-                    yield Button("Start mining", id="db-toggle", variant="primary")
-                    yield Button("Test the miner", id="db-test")
+                    yield Button(START, id="db-toggle", variant="primary")
+                    yield Button("Test Miner (t)", id="db-test")
                 with Horizontal(classes="forge-buttons bf-box-buttons", id="db-fixes"):
-                    yield Button("Add your wallet", id="db-wallet", variant="primary")
-                    yield Button("Restore the newest backup", id="db-restore", variant="primary")
-                    yield Button("How to install the miner", id="db-install", variant="primary")
+                    yield Button("Add Your Wallet", id="db-wallet", variant="primary")
+                    yield Button("Restore the Newest Backup", id="db-restore", variant="primary")
+                    yield Button("How to Install the Miner", id="db-install", variant="primary")
             with Vertical(classes="bf-box", id="box-speed"):
                 yield Static("", id="db-speed")
             with Vertical(classes="bf-box", id="box-odds"):
@@ -106,7 +108,7 @@ class DashboardScreen(VerticalScroll, can_focus=False):
         self.query_one("#db-mining", Static).update("\n".join(lines))
 
         toggle = self.query_one("#db-toggle", Button)
-        toggle.label = "Stop mining" if app.miner.running else "Start mining"
+        toggle.label = STOP if app.miner.running else START
         toggle.variant = "error" if app.miner.running else "primary"
         toggle.disabled = not app.miner.running and bool(problems)
         self.query_one("#db-test", Button).disabled = app.miner.running or app.testing

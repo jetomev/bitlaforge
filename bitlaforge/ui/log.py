@@ -16,7 +16,7 @@ from textual.binding import Binding
 from textual.containers import Horizontal, Vertical
 from textual.widgets import Button, Input, RichLog, Select, Static
 
-from forgekit import Toggle, glyph
+from forgekit import MENU_HINT, Toggle, glyph
 
 KEEP = 5000
 SHOW = [("Important", "important"), ("Everything", "all"), ("Problems", "problems"), ("Shares", "shares")]
@@ -27,7 +27,7 @@ STYLE = {"accepted": ("ok", "forge-ok"), "connected": ("ok", "forge-ok"), "rejec
 class LogScreen(Vertical):
     BINDINGS = [Binding("slash", "find", "", show=False), Binding("f", "follow", "", show=False),
                 Binding("c", "clear", "", show=False)]
-    FORGE_HINTS = [("/", "find"), ("F", "follow on/off"), ("C", "clear"), ("1-4", "screens"), ("?", "all keys")]
+    FORGE_HINTS = [("/", "find"), ("F", "follow on/off"), ("C", "clear"), MENU_HINT, ("?", "all keys")]
 
     def __init__(self, **kw) -> None:
         super().__init__(**kw)
@@ -48,8 +48,8 @@ class LogScreen(Vertical):
             yield Toggle(True, on_label="Following", off_label="Not following", id="lg-follow")
         yield RichLog(id="lg-lines", max_lines=KEEP, wrap=True, markup=False, auto_scroll=True)
         with Horizontal(classes="forge-buttons lg-actions"):
-            yield Button("Copy the log", id="lg-copy")
-            yield Button("Clear", id="lg-clear")
+            yield Button("Copy the Log", id="lg-copy")
+            yield Button("Clear (c)", id="lg-clear")
 
     # ── lines ────────────────────────────────────────────────────────────────
     def wanted(self, e) -> bool:

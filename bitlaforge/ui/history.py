@@ -11,14 +11,14 @@ from textual.app import ComposeResult
 from textual.containers import Vertical
 from textual.widgets import DataTable, Static
 
-from forgekit import glyph
+from forgekit import MENU_HINT, glyph
 
 from .. import history
 from ..miner import speed
 
 
 class HistoryScreen(Vertical):
-    FORGE_HINTS = [("↑↓", "move"), ("1-4", "screens"), ("F1", "help"), ("?", "all keys")]
+    FORGE_HINTS = [("↑↓", "move"), MENU_HINT, ("F1", "help"), ("?", "all keys")]
 
     def compose(self) -> ComposeResult:
         yield Static("[b $forge-title-accent]History[/]   [$forge-muted]every mining session, kept between "
