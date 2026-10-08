@@ -1,6 +1,6 @@
 .\" bitlaforge.1 — bitlaForge man page
 .\" GNU GPL v3 — see LICENSE
-.TH BITLAFORGE 1 "October 2026" "bitlaForge v1.0.0" "User Commands"
+.TH BITLAFORGE 1 "October 2026" "bitlaForge v1.1.0" "User Commands"
 .
 .SH NAME
 bitlaforge \- solo Bitcoin mining, honestly framed
@@ -72,8 +72,9 @@ Start or stop mining.
 .B T
 Test the miner: 10 seconds on one core, without a pool.
 .TP
-.B 1 \(en 4 ", " Ctrl+letter
-Go to a screen.
+.B 1 \(en 5 ", " Ctrl+letter
+Go to a menu entry: the four screens, then the Help menu. Ctrl with an
+entry's underlined letter works even while typing in a field.
 .TP
 .B Tab ", " Shift+Tab
 Next / previous field or button.
@@ -142,7 +143,7 @@ The last answer from mempool.space.
 .
 .SH REQUIREMENTS
 Linux; Python 3.11 or newer; python-textual, python-rich, python-tomlkit and
-python-forgekit 0.5.1 or newer; util-linux. To mine:
+python-forgekit 0.10.0 or newer; util-linux. To mine:
 .B minerd
 (the cpuminer package on Arch and openSUSE; elsewhere the cpuminer project's
 ready-made program, see the manual).

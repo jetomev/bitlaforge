@@ -15,10 +15,10 @@ History (`~/.local/share/bitlaforge/history.json`) and backups (`~/.config/bitla
 ## Tests and warnings
 
 ```sh
-PYTHONPATH=~/Programs/forgekit python -W default -m unittest discover tests
+PYTHONPATH=~/Programs/forge-suite/forgekit python -W default -m unittest discover -s tests
 ```
 
-All pass, **report the count** (1.0.0: 64) and the warnings (1.0.0: 0). A drop in the count means a test was deleted silently. The AUR `check()` runs the same tests.
+All pass, **report the count** (1.0.0: 64; 1.1.0: 81) and the warnings (1.0.0: 0; 1.1.0: 0). A drop in the count means a test was deleted silently. The AUR `check()` runs the same tests.
 
 ## Every distribution
 

@@ -6,7 +6,7 @@
 ![Platform: Linux](https://img.shields.io/badge/Platform-Linux-lightgrey.svg)
 ![Python: 3.11+](https://img.shields.io/badge/Python-3.11+-green.svg)
 ![Status: Stable](https://img.shields.io/badge/Status-Stable-brightgreen.svg)
-![Version: 1.0.0](https://img.shields.io/badge/Version-1.0.0-purple.svg)
+![Version: 1.1.0](https://img.shields.io/badge/Version-1.1.0-purple.svg)
 [![AUR](https://img.shields.io/aur/version/bitlaforge?v=1.0.0-1)](https://aur.archlinux.org/packages/bitlaforge)
 
 > 🛡 **Security** — every release is GPG-signed and every commit is GitHub-Verified. **[Where We Stand](https://github.com/jetomev/KognogOS/blob/main/docs/where-we-stand.md)** covers our response to the 2026 AUR supply-chain attacks and how to check us yourself.
@@ -36,7 +36,7 @@ That's the game: a lottery ticket your processor keeps buying. **bitlaForge is t
 - 📖 **A manual inside the app** (Help ▸ Manual), and **F1** on any setting opens its page.
 - 🐧 **Every major distribution**, tested with each one's own miner; readable on a plain text console; nothing cut off at 100 columns.
 
-Built on [forgekit](https://github.com/jetomev/forgekit), the Forge Suite's shared base, so it looks and works like grubForge and alacrittyForge.
+Built on [forgekit](https://github.com/jetomev/forge-suite/tree/main/forgekit), the Forge Suite's shared base, so it looks and works like grubForge and alacrittyForge.
 
 ---
 
@@ -70,7 +70,7 @@ Built on [forgekit](https://github.com/jetomev/forgekit), the Forge Suite's shar
 ## Requirements
 
 - Linux, Python 3.11 or newer
-- `python-textual`, `python-rich`, `python-tomlkit` and [`python-forgekit`](https://github.com/jetomev/forgekit) 0.5.1 or newer
+- `python-textual`, `python-rich`, `python-tomlkit` and [`python-forgekit`](https://github.com/jetomev/forge-suite/tree/main/forgekit) 0.10.0 or newer
 - `util-linux` (for `setpriv`, already on every distribution)
 - **`minerd`** to actually mine (see below); bitlaForge runs without it and says how to get it
 
@@ -91,10 +91,10 @@ With any other AUR helper: `yay -S bitlaforge` and `yay -S cpuminer`.
 
 ```bash
 git clone https://github.com/jetomev/bitlaforge.git
-git clone https://github.com/jetomev/forgekit.git
+git clone https://github.com/jetomev/forge-suite.git     # forgekit lives inside it
 cd bitlaforge
 python3 -m venv .venv && .venv/bin/pip install textual rich tomlkit
-PYTHONPATH=../forgekit .venv/bin/python main.py
+PYTHONPATH=../forge-suite/forgekit .venv/bin/python main.py
 ```
 
 A virtual environment is used because most distributions refuse `pip install` into the system Python.
@@ -135,7 +135,7 @@ When it closes, the terminal gets a short record: how long it mined, the shares,
 |---|---|
 | M | start or stop mining |
 | T | test the miner (10 seconds, one core, nothing sent) |
-| 1 – 4, or Ctrl + the underlined letter | Dashboard, Settings, Log, History |
+| 1 – 5, or Ctrl + the underlined letter | Dashboard, Settings, Log, History, and the Help menu |
 | Tab / Shift+Tab | next / previous field or button |
 | Enter | open a list, press a button, confirm |
 | Space | flip a switch |
@@ -146,9 +146,13 @@ When it closes, the terminal gets a short record: how long it mined, the shares,
 | F1 | help on what is selected |
 | / F C | in the Log: find, follow, clear |
 | ? | all keys |
-| Q, or Ctrl+Q | quit (stops the miner, after asking) |
+| Q, or Ctrl+Q | quit (stops the miner, after asking); not there inside hypeForge Settings |
 
-Letter keys never act while you're typing in a field. The full manual is in [`bitlaforge/manual/`](bitlaforge/manual/), and inside the app.
+Letter keys and numbers never act while you're typing in a field; Ctrl + a letter always works. Each button shows its key in brackets, like **Start Mining (m)**. The full manual is in [`bitlaforge/manual/`](bitlaforge/manual/), and inside the app.
+
+### Inside hypeForge Settings
+
+hypeForge (the KognogOS desktop) shows bitlaForge as one page of its Settings window. It starts it with a hidden option, `bitlaforge --hypeforge` (`--hypeForge` works too), which you never need to type. On that page bitlaForge has **no Quit**: Q and Ctrl+Q do nothing, and Settings closes it. If the miner is running, or a change isn't saved, bitlaForge **asks first**, just as its own Quit would, so the miner still never outlives it.
 
 ---
 
@@ -182,13 +186,25 @@ Still on the plan from before 1.0:
 
 ### Done
 
+- [x] **v1.1.0** ([#13](https://github.com/jetomev/bitlaforge/issues/13)): the same keys as every Forge app (a number and Ctrl + the underlined letter for every menu entry, Help included); a page of hypeForge Settings with no Quit of its own; buttons that show their key, like **Start Mining (m)**
 - [x] **v1.0.0** ([#4](https://github.com/jetomev/bitlaforge/issues/4)): rebuilt to match grubForge 2.0; the miner never outlives bitlaForge; real odds; History; pause when hot; the wallet checked; every major distribution
-- [x] **v0.2.1**: Shortcuts window and window anatomy polish
 - [x] Earlier releases: [docs/ROADMAP.md](docs/ROADMAP.md)
 
 ---
 
 ## Changelog
+
+### v1.1.0 — October 8, 2026
+
+**The same keys as every Forge app** ([#13](https://github.com/jetomev/bitlaforge/issues/13)). On 8 October Javier ran the Forge apps inside hypeForge Settings and asked for all six to move together. bitlaForge now gets its menu keys from forgekit 0.10.0, the suite's shared base, instead of writing its own:
+
+- ⌨ **A number for every menu entry, Help included**: **1** Dashboard, **2** Settings, **3** Log, **4** History, **5** opens the Help menu. **Ctrl + the underlined letter** does the same, and works even while you're typing in a field. The bottom bar says **1-5 menu** instead of *1-4 screens*.
+- 🧩 **A page of hypeForge Settings**: started with the hidden option `--hypeforge`, bitlaForge has no Quit of its own (Q and Ctrl+Q do nothing) and Settings closes it. If the miner is running, it **asks first** and then stops it, so the miner still never outlives bitlaForge. The option is left out of `--help` and the man page on purpose: it is for hypeForge, not for people.
+- 🔘 **Buttons say their key** (Javier, 3 October): **Start Mining (m)**, **Test Miner (t)**, **Save Changes (s)**, **Clear (c)**, **Stay (Esc)**. In the review before saving, **S** now presses Save.
+- 🛠 **A rare error at closing is gone**: the Dashboard's once-a-second refresh could fire while bitlaForge was closing and end the run with an error message. Found by the new tests.
+- 📚 The install-from-source steps now fetch forgekit from the Forge Suite repository, where it lives since 6 October.
+
+Tests: 64 → **81**; warnings 0 → 0. Dependency: `python-forgekit` ≥ 0.10.0. Nothing changes in your settings or history.
 
 ### v1.0.0 — October 2, 2026
 
@@ -204,10 +220,6 @@ Still on the plan from before 1.0:
 
 Tested by Javier on KognogOS with real mining: *"so much better!"* Tests: 0 → **64**; warnings 0. Dependencies: `python-tomlkit` (new), `python-forgekit` ≥ 0.5.1, `util-linux`; no longer `python-tomli-w`. Your 0.2.x settings carry over as they are.
 
-### v0.2.1 — August 9, 2026
-
-**A window-polish batch**, from the second hands-on review that week: the Shortcuts window showed both ways to do something, `T` came back as Test Miner, `Ctrl+H` opened Shortcuts, and windows got a fixed footer for their buttons, which every Forge dialog since follows.
-
 *The complete history lives in [docs/CHANGELOG.md](docs/CHANGELOG.md).*
 
 ---
@@ -221,7 +233,7 @@ This was once **BitLA**, a Qt desktop prototype from November 2025 with a simula
 ## Related Projects
 
 - **[KognogOS](https://github.com/jetomev/KognogOS)**: the distribution the Forge Suite ships with
-- **[forgekit](https://github.com/jetomev/forgekit)**: the shared foundation for the Forge apps
+- **[forgekit](https://github.com/jetomev/forge-suite/tree/main/forgekit)**: the shared foundation for the Forge apps, part of the [Forge Suite](https://github.com/jetomev/forge-suite)
 - **[nog](https://github.com/jetomev/nog)**: tier-aware package manager
 - **[grubForge](https://github.com/jetomev/grubforge)**: bootloader manager
 - **[alacrittyForge](https://github.com/jetomev/alacrittyforge)**: Alacritty's settings

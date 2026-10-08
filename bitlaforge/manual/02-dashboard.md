@@ -4,10 +4,10 @@ Four boxes, refreshed every second.
 
 ## Mining
 
-Whether the miner is running, for how long, and through which pool. If something stops mining from starting (no wallet yet, a settings file that can't be read, the miner not installed), it's said here, with the button that fixes it.
+Whether the miner is running, for how long, and through which pool. If something stops mining from starting (no wallet yet, a settings file that can't be read, the miner not installed), it's said here, with the button that fixes it (**Add Your Wallet**, **Restore the Newest Backup** or **How to Install the Miner**).
 
-- **Start mining** / **Stop mining**, or press **M**.
-- **Test the miner**, or press **T**: runs the miner for 10 seconds on one core with no pool, and says how fast one core is. Nothing is sent anywhere.
+- **Start Mining (m)** / **Stop Mining (m)**: the letter in brackets is the key that does the same.
+- **Test Miner (t)**: runs the miner for 10 seconds on one core with no pool, and says how fast one core is. Nothing is sent anywhere.
 
 When the pool can't be reached, the box says so; the miner keeps trying every 30 seconds by itself.
 

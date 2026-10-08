@@ -2,6 +2,36 @@
 
 *The README carries the two most recent entries; the complete history lives here, newest-first.*
 
+### v1.1.0 — October 8, 2026
+
+**The same keys as every Forge app** ([#13](https://github.com/jetomev/bitlaforge/issues/13)). On 8 October Javier ran the Forge apps inside hypeForge Settings and asked for all six to move together. bitlaForge now gets its menu keys from forgekit 0.10.0, the suite's shared base, instead of writing its own:
+
+- ⌨ **A number for every menu entry, Help included**: **1** Dashboard, **2** Settings, **3** Log, **4** History, **5** opens the Help menu. **Ctrl + the underlined letter** does the same, and works even while you're typing in a field. The bottom bar says **1-5 menu** instead of *1-4 screens*.
+- 🧩 **A page of hypeForge Settings**: started with the hidden option `--hypeforge`, bitlaForge has no Quit of its own (Q and Ctrl+Q do nothing) and Settings closes it. If the miner is running, it **asks first** and then stops it, so the miner still never outlives bitlaForge. The option is left out of `--help` and the man page on purpose: it is for hypeForge, not for people.
+- 🔘 **Buttons say their key** (Javier, 3 October): **Start Mining (m)**, **Test Miner (t)**, **Save Changes (s)**, **Clear (c)**, **Stay (Esc)**. In the review before saving, **S** now presses Save.
+- 🛠 **A rare error at closing is gone**: the Dashboard's once-a-second refresh could fire while bitlaForge was closing and end the run with an error message. Found by the new tests.
+- 📚 The install-from-source steps now fetch forgekit from the Forge Suite repository, where it lives since 6 October.
+
+Tests: 64 → **81**; warnings 0 → 0. Dependency: `python-forgekit` ≥ 0.10.0. Nothing changes in your settings or history.
+
+### v1.0.0 — October 2, 2026
+
+**bitlaForge, rebuilt, and safe.** Every screen was redesigned to match grubForge 2.0, from a plan Javier approved screen by screen before any code was written. Taking stock of 0.2.1 first found that **closing it left the miner running**, with the processor at full load and nothing on screen to stop it. That and three more are fixed, each with a test:
+
+- 🛑 **The miner never outlives bitlaForge** ([#5](https://github.com/jetomev/bitlaforge/issues/5)): closing asks, then stops it; a parent-death signal stops it even if bitlaForge is killed.
+- 📊 **Rejected shares are counted** ([#6](https://github.com/jetomev/bitlaforge/issues/6)): the miner reports them inside its "accepted" line; 0.2.1 always showed 0.
+- 🔌 **Pools typed as `name:port` connect** ([#7](https://github.com/jetomev/bitlaforge/issues/7)): without `stratum+tcp://` the miner contacted the pool as a website. Pools are now picked from a list.
+- 💾 **A broken settings file is never saved over** ([#8](https://github.com/jetomev/bitlaforge/issues/8)): 0.2.1 read a file with one typo as blank settings, and the next save erased the wallet. Saves are reviewed, backed up and written in one step.
+- ⌨ **Esc leaves a field** ([#3](https://github.com/jetomev/bitlaforge/issues/3)); readable on a plain text console ([#2](https://github.com/jetomev/bitlaforge/issues/2)).
+- 🆕 **Four screens** (Dashboard, Settings, Log, History), the speed chart and per-core bars, the honest odds, pause when hot, the wallet checked offline, **Bitcoin only**, a manual inside the app, `--version` / `--help`, the closing note.
+- 🐧 **Every major distribution**: tested with each one's own miner in Debian, Ubuntu, Fedora and openSUSE VMs; the manual says how to get the miner on each.
+
+Tested by Javier on KognogOS with real mining: *"so much better!"* Tests: 0 → **64**; warnings 0. Dependencies: `python-tomlkit` (new), `python-forgekit` ≥ 0.5.1, `util-linux`; no longer `python-tomli-w`. Your 0.2.x settings carry over as they are.
+
+### v0.2.1 — August 9, 2026
+
+**A window-polish batch**, from the second hands-on review that week: the Shortcuts window showed both ways to do something, `T` came back as Test Miner, `Ctrl+H` opened Shortcuts, and windows got a fixed footer for their buttons, which every Forge dialog since follows.
+
 ### v0.2.0 — August 8, 2026
 
 **The forgekit adoption.** bitlaForge became the first Forge app to move onto the shared foundation, and the one that road-tested it.

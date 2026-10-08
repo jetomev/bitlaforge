@@ -7,7 +7,7 @@ Press **3**. What the miner says, newest at the bottom, with times. The lines th
 - **Show**: *Important* (the default: everything but the per-core speed lines, which come every few seconds), *Everything*, *Problems*, or *Shares*.
 - **Find** (or **/**): only lines containing the text. **Esc** leaves the field.
 - **Following** (or **F**): keep the newest line in view. Turn it off to read back while the miner keeps writing.
-- **Copy the log** copies what's shown; **Clear** (or **C**) empties it. The miner keeps running.
+- **Copy the Log** copies what's shown; **Clear (c)** empties it. The miner keeps running.
 
 The newest 5,000 lines are kept while bitlaForge is open. Your wallet is never written in the Log.
 

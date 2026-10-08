@@ -18,4 +18,4 @@ Turn it off and no internet is used for this; the Dashboard then doesn't show th
 
 Every save shows each change, old → new, before anything is written; a copy of the settings file is made first (the newest 20 are kept in `~/.config/bitlaforge/backups/`); and the file is written in one step, so it's never left half-written. Anything else in the file, your own notes included, stays.
 
-If the settings file can't be read (a typo made by hand, for example), bitlaForge **never saves over it**: the Dashboard says why, mining can't start, and **Restore the newest backup** puts the last good one back (the broken file is backed up first).
+If the settings file can't be read (a typo made by hand, for example), bitlaForge **never saves over it**: the Dashboard says why, mining can't start, and **Restore the Newest Backup** puts the last good one back (the broken file is backed up first).

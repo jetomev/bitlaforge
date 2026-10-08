@@ -2,6 +2,12 @@
 
 *The live work list and the handoff between sessions. Newest work first. Updated after every step.*
 
+- [ ] **1.1.0 — the same keys as every Forge app ([#13](https://github.com/jetomev/bitlaforge/issues/13)), built 8 Oct 2026, waiting for Javier's test; GitHub + AUR at release.**
+  - ✅ Built, on forgekit 0.10.0 (unreleased, in `~/Programs/forge-suite/forgekit`): 1-5 and Ctrl + the underlined letter for every menu entry, Help included (5 = Help), from forgekit; the app's own 1-4 and Ctrl+D/E/L/Y removed. Bottom bar "1-5 menu". `--hypeforge` / `--hypeForge` (hidden from `--help` and the man page): no Quit, Q/Ctrl+Q do nothing; Settings closing it asks first while mining or with unsaved changes (asked twice = one question). Button labels "Words in Title Case (k)". A shutdown error found by the new tests fixed (the 1-second refresh while closing). From-source install now clones forge-suite (the forgekit repo is archived).
+  - ✅ Tests 64 → **81**, warnings 0 → 0; 17 failing-direction checks (each fix taken out, its test fails, put back). Console preview clean (Dashboard, Log, Help menu under `--hypeforge`). Screenshots regenerated. Version 1.1.0 in `__init__.py`, README badge, man page, CHANGELOG/ROADMAP; forgekit ≥ 0.10.0 in README + man page.
+  - [ ] **Javier's run**: `testing/20261008 - Test Matrix for bitlaForge v1-1-0.md` (from the source folder; installed forgekit is 0.9.0). Then the Test Results file.
+  - [ ] Release (after his pass): forgekit 0.10.0 on GitHub + AUR **first**; then tag, GitHub release, AUR PKGBUILD (`python-forgekit>=0.10.0`, content in lockstep), close #13 with an explanation; open bitlaForge from hypeForge Settings itself once both packages are installed.
+
 
 - [x] **1.0 design approved (2 Oct, 23:03)**: all six answers yes ("Love it!", "Wow! I like it!") — https://claude.ai/artifact/Rtcb5HuMzYntERx5JoWxLj, issue #4. Findings opened: F-2 #5 quit leaves the miner running · F-3 #6 rejected never counted · F-4 #7 host:port never connects · F-5 #8 broken config replaced silently.
 - [ ] **1.0 build** (#4), in order, each with tests:
@@ -14,7 +20,7 @@
   6. ✅ **Released v1.0.0 (3 Oct, ~00:05)**: tag `v1.0.0` (docs `99fdd67`), GitHub Latest (asset byte-identical), AUR 1.0.0-1 (`f6bd612`, build ran 64 tests), badge `7e3981b`, About + topic `linux`, issues #2–#8 closed with explanations, backlog #9 #10 #11 linked from the README. Left: Javier's `nog install bitlaforge` (upgrade from 1.0.0rc1).
   - ~~Ask Javier about stratum.ckpool.org~~ — he switched to solo.ckpool.org in his run.
 
-- [ ] **Next version — button labels in Javier's format (3 Oct 2026):** "Words In Title Case (k)", e.g. "Review Updates (u)": the key in brackets after the words, for every Forge Suite app. What shipped stays until this app's next version.
+- [x] **Next version — button labels in Javier's format (3 Oct 2026):** "Words In Title Case (k)", e.g. "Review Updates (u)": the key in brackets after the words, for every Forge Suite app. Done in 1.1.0 (#13): Start Mining (m), Stop Mining (m), Test Miner (t), Add Your Wallet, Restore the Newest Backup, How to Install the Miner, Copy the Log, Clear (c), Save Changes (s), Discard Changes, Save (s), Stop Mining and Quit, Save First, Quit Without Saving, Stay (Esc).
 
 - [x] **Checked (3 Oct): bitlaForge's Log on a text console is fine.** nogForge crashed on console colour names (`ansi_bright_green`) passed to Rich; bitlaForge's Log passes the same names but Textual's RichLog reads them: no crash (headless), and the 2 Oct console preview of the Log listed bright green among the colours drawn.
 ## Next — the grubForge 2.0 look (Javier, 2026-10-02)

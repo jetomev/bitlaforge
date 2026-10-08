@@ -9,6 +9,8 @@ bitlaForge lets this computer take part in Bitcoin mining **as the lottery it is
 - **3 Log**: what the miner says, in plain words where it matters.
 - **4 History**: every session you've mined, kept between runs.
 
+**5** opens the Help menu (this manual, the keys, the license, About). **Ctrl** with a menu entry's underlined letter does the same as its number.
+
 ## Your first time
 
 1. Install the miner if the Dashboard asks for it (Help ▸ Manual ▸ *Installing the miner*).
@@ -18,6 +20,6 @@ bitlaForge lets this computer take part in Bitcoin mining **as the lottery it is
 
 ## Three promises
 
-- bitlaForge **never starts mining on its own**. Only **M** (or the Start button) does.
-- **Closing bitlaForge stops the miner.** If it's running, bitlaForge asks first. Even if bitlaForge were to crash, the system itself stops the miner with it.
+- bitlaForge **never starts mining on its own**. Only **M** (or the **Start Mining (m)** button) does.
+- **Closing bitlaForge stops the miner.** If it's running, bitlaForge asks first. Even if bitlaForge were to crash, the system itself stops the miner with it. Inside hypeForge Settings too (see *Keys*).
 - **Your settings are never lost to a save**: every save is reviewed, backed up first, and written in one step.
