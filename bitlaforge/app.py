@@ -7,7 +7,10 @@ History); Bitcoin only; pause when hot; honest odds from mempool.space; and
 closing bitlaForge always stops the miner, after asking.
 
 1.1.0 (#13, Javier 8 Oct 2026): the menu keys come from forgekit 0.10.0 (Ctrl + the
-underlined letter and 1-5 for every menu entry, Help included); ``--hypeforge`` makes
+underlined letter and 1-5 for every menu entry, Help included). The letters follow
+Javier's rule (forgekit picks them: the title's first letter, else its next free one;
+Help H, Quit Q), so MENU names none: Ctrl+D, S, L, I (History: H is Help). About and
+License open as pages, not windows (forgekit). ``--hypeforge`` makes
 bitlaForge a page of hypeForge Settings (no Quit of its own); button labels read
 "Words in Title Case (k)", the key that presses them in brackets.
 """
@@ -123,9 +126,9 @@ class BitlaForgeApp(ForgeApp):
     LICENSE_NOTICE = GPL3_NOTICE
     MENU = [
         {"id": "dashboard", "title": "Dashboard", "kind": "section"},
-        {"id": "settings", "title": "Settings", "kind": "section", "acc": "e"},
+        {"id": "settings", "title": "Settings", "kind": "section"},
         {"id": "log", "title": "Log", "kind": "section"},
-        {"id": "history", "title": "History", "kind": "section", "acc": "y"},
+        {"id": "history", "title": "History", "kind": "section"},
         {"id": "help", "title": "Help", "kind": "menu", "items": [
             ("Manual", "m", "manual"), ("Keys", "k", "shortcuts"),
             ("License", "l", "license"), ("About", "a", "about")]},
@@ -139,7 +142,8 @@ class BitlaForgeApp(ForgeApp):
         ("Space", "flip a switch"),
         ("↑↓ in a number", "step through its presets"),
         ("Esc", "close a window, or leave a field"),
-        ("1-5, Ctrl+letter", "go to a menu entry, Help included (Ctrl + its underlined letter)"),
+        ("1-5, Ctrl+letter", "go to a menu entry, Help included: Ctrl+D Dashboard, Ctrl+S Settings, "
+                             "Ctrl+L Log, Ctrl+I History, Ctrl+H Help"),
         ("F10 or S", "save settings, with a review first"),
         ("R", "read the settings file again"),
         ("F1", "help on what is selected"),

@@ -4,7 +4,7 @@
 |---|---|
 | **M** | start or stop mining |
 | **T** | test the miner (10 seconds, one core, nothing sent) |
-| **1 – 5**, or **Ctrl** + the underlined letter | Dashboard, Settings, Log, History, and the Help menu |
+| **1 – 5**, or **Ctrl+D**, **Ctrl+S**, **Ctrl+L**, **Ctrl+I**, **Ctrl+H** | Dashboard, Settings, Log, History, and the Help menu (its number or Ctrl key again closes it) |
 | **Tab** / **Shift+Tab** | next / previous field or button |
 | **Enter** | open a list, press a button, confirm |
 | **Space** | flip a switch |
@@ -17,6 +17,10 @@
 | **Q** or **Ctrl+Q** | quit (stops the miner, after asking); not there inside hypeForge Settings |
 
 Letter keys and numbers never act while you're typing in a field; **Esc** leaves the field. **Ctrl** + a letter works even inside a field.
+
+Each menu entry's Ctrl letter is the underlined one: the first letter of its name, unless another entry already has it, then the next letter of its name. Help is always **H**, which is why History is **Ctrl+I**. On a plain text console (and some older terminals) **Ctrl+I** is the same key as **Tab**, so there **4** goes to History.
+
+**Help ▸ About** and **Help ▸ License** open as pages in the window, with Help lit at the top; **Esc** goes back to where you were.
 
 Every button shows its key in brackets: **Start Mining (m)** is the same as pressing **M**, **Stay (Esc)** the same as **Esc**.
 

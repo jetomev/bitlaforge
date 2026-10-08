@@ -27,9 +27,10 @@ Usage:
   bitlaforge --version   print the version
   bitlaforge --help      print this
 
-Inside: M starts and stops mining (never on its own), T tests the miner,
-1-5 or Ctrl + the underlined letter open a menu entry (Help included),
-F10 saves settings (with a review first), F1 explains, ? lists every key.
+Inside: M starts and stops mining (never on its own), T tests the miner.
+1-5, or Ctrl+D, Ctrl+S, Ctrl+L, Ctrl+I, Ctrl+H: Dashboard, Settings, Log,
+History, Help. F10 saves settings (with a review first), F1 explains,
+? lists every key.
 Closing bitlaForge stops the miner.
 Manual: https://github.com/jetomev/bitlaforge/tree/main/bitlaforge/manual
 """

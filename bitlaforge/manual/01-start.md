@@ -9,7 +9,7 @@ bitlaForge lets this computer take part in Bitcoin mining **as the lottery it is
 - **3 Log**: what the miner says, in plain words where it matters.
 - **4 History**: every session you've mined, kept between runs.
 
-**5** opens the Help menu (this manual, the keys, the license, About). **Ctrl** with a menu entry's underlined letter does the same as its number.
+**5** opens the Help menu (this manual, the keys, the license, About), and **5** again closes it. **Ctrl** with a menu entry's underlined letter does the same as its number: **Ctrl+D**, **Ctrl+S**, **Ctrl+L**, **Ctrl+I**, **Ctrl+H**.
 
 ## Your first time
 

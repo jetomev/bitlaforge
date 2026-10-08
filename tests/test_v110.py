@@ -1,5 +1,6 @@
 """bitlaForge 1.1.0 (#13, Javier 8 Oct 2026): the menu keys come from forgekit 0.10.0
-(1-5 and Ctrl + the underlined letter, Help included), the bottom bar says "1-5 menu",
+(1-5 and Ctrl + the underlined letter, Help included; the letters by Javier's rule:
+Ctrl+D, S, L, I, H), About and License open as pages, the bottom bar says "1-5 menu",
 --hypeforge makes bitlaForge a page of hypeForge Settings (no Quit of its own; Settings
 asks it to close), and buttons read "Words in Title Case (k)".
 
@@ -22,7 +23,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from test_screens import Base, alive  # noqa: E402
 
 from forgekit import HintBar, menu_key_clashes  # noqa: E402
-from forgekit.menu import MenuDropdown, accel  # noqa: E402
+from forgekit.menu import MenuDropdown, assign_accels  # noqa: E402
 from textual.widgets import Button  # noqa: E402
 
 SECTIONS = ["dashboard", "settings", "log", "history"]
@@ -51,12 +52,21 @@ class MenuKeys(Base):
         from bitlaforge.app import BitlaForgeApp
         self.assertEqual(menu_key_clashes(BitlaForgeApp.MENU), [])
 
+    def test_the_letters_follow_javiers_rule(self):
+        # the first letter of the title unless taken, else the next one of the title; Help H,
+        # Quit Q. forgekit picks them, so bitlaForge's MENU names none ("acc" is ignored)
+        from bitlaforge.app import BitlaForgeApp
+        self.assertFalse([m["id"] for m in BitlaForgeApp.MENU if "acc" in m], "MENU names no letters")
+        app = self.app()                                   # the letters the running app really uses
+        self.assertEqual({m["id"]: m["acc"] for m in app.MENU},
+                         {"dashboard": "d", "settings": "s", "log": "l", "history": "i", "help": "h", "quit": "q"})
+
     def test_no_hand_written_menu_keys_and_no_ctrl_clash(self):
         # forgekit makes 1-5 and Ctrl+letter from MENU; a copy in the app would shadow it, and
         # any other Ctrl key of bitlaForge's on an underlined letter would be a dead key
         from bitlaforge.app import BitlaForgeApp, QuitDialog
         from bitlaforge.ui.log import LogScreen
-        ctrl = {f"ctrl+{accel(m)}" for m in BitlaForgeApp.MENU}
+        ctrl = {f"ctrl+{c}" for c in assign_accels(BitlaForgeApp.MENU).values()}
         own = [b for cls in (BitlaForgeApp, LogScreen, QuitDialog) for b in cls.__dict__.get("BINDINGS", [])]
         for b in own:
             for key in b.key.split(","):
@@ -88,13 +98,20 @@ class MenuKeys(Base):
         app = self.app()
         async with app.run_test(size=(100, 30)) as pilot:
             await pilot.pause(0.5)
-            await pilot.press("ctrl+e")
+            await pilot.press("ctrl+s")
             await pilot.pause(0.3)
             self.assertEqual(app.query_one("#forge-work").current, "sec-settings")
+            # Tab still moves between fields: in a terminal Ctrl+I and Tab are one key, and
+            # History's Ctrl+I must never take Tab over
+            self.assertEqual(app.focused.id, "bf-groups")
+            await pilot.press("tab")
+            await pilot.pause(0.2)
+            self.assertNotEqual(app.focused.id, "bf-groups", "Tab moved on")
+            self.assertEqual(app.query_one("#forge-work").current, "sec-settings", "and stayed on Settings")
             app.query_one("#row-miner_name").control.focus()
             await pilot.pause(0.2)
-            for key, sec in (("ctrl+l", "log"), ("ctrl+y", "history"), ("ctrl+d", "dashboard"),
-                             ("ctrl+e", "settings")):
+            for key, sec in (("ctrl+l", "log"), ("ctrl+i", "history"), ("ctrl+d", "dashboard"),
+                             ("ctrl+s", "settings")):
                 await pilot.press(key)
                 await pilot.pause(0.3)
                 self.assertEqual(app.query_one("#forge-work").current, f"sec-{sec}", key)
@@ -115,6 +132,50 @@ class MenuKeys(Base):
                 self.assertIn("menu", text, f"screen {key}")
                 self.assertNotIn("screens", text, f"screen {key}")
                 self.assertNotIn("{menu}", text, f"screen {key}")
+
+
+class HelpMenuAndPages(Base):
+    """Javier's second run, 8 Oct 2026: a menu's number pressed again closes it, the open menu's
+    title is lit, and About and License are pages in the window, not windows over it."""
+
+    def lit(self, app, entry: str) -> bool:
+        w = app.screen_stack[0].query_one(f"#menu-{entry}")
+        return w.has_class("open") or w.has_class("active")
+
+    async def test_5_opens_help_lit_and_5_again_closes_it(self):
+        app = self.app()
+        async with app.run_test(size=(100, 30)) as pilot:
+            await pilot.pause(0.5)
+            await pilot.press("5")
+            await pilot.pause(0.3)
+            self.assertEqual(getattr(app.screen, "menu_id", None), "help")
+            self.assertTrue(self.lit(app, "help"), "Help is lit while its menu is open")
+            await pilot.press("5")
+            await pilot.pause(0.3)
+            self.assertEqual(len(app.screen_stack), 1, "5 again closes it")
+            self.assertFalse(self.lit(app, "help"), "and Help is no longer lit")
+            self.assertTrue(self.lit(app, "dashboard"))
+
+    async def test_about_and_license_are_pages_and_esc_goes_back(self):
+        app = self.app()
+        async with app.run_test(size=(100, 30)) as pilot:
+            await pilot.pause(0.5)
+            for item, page in (("a", "forge-about"), ("l", "forge-license")):
+                await pilot.press("3")                     # from the Log
+                await pilot.pause(0.3)
+                await pilot.press("5", item)
+                await pilot.pause(0.4)
+                self.assertEqual(len(app.screen_stack), 1, f"{page}: no window over the app")
+                self.assertEqual(app.query_one("#forge-work").current, f"sec-{page}")
+                self.assertTrue(self.lit(app, "help"), f"{page}: Help lit")
+                self.assertFalse(self.lit(app, "log"))
+                await pilot.press("escape")
+                await pilot.pause(0.3)
+                self.assertEqual(app.query_one("#forge-work").current, "sec-log", f"{page}: Esc goes back")
+                self.assertTrue(self.lit(app, "log"))
+            about = str(app.query_one("#sec-forge-about").render()) + " ".join(
+                str(w.render()) for w in app.query_one("#sec-forge-about").query("*"))
+            self.assertIn("bitlaForge", about)
 
 
 class InsideHypeForgeSettings(Base):

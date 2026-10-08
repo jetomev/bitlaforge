@@ -6,13 +6,15 @@
 
 **The same keys as every Forge app** ([#13](https://github.com/jetomev/bitlaforge/issues/13)). On 8 October Javier ran the Forge apps inside hypeForge Settings and asked for all six to move together. bitlaForge now gets its menu keys from forgekit 0.10.0, the suite's shared base, instead of writing its own:
 
-- ⌨ **A number for every menu entry, Help included**: **1** Dashboard, **2** Settings, **3** Log, **4** History, **5** opens the Help menu. **Ctrl + the underlined letter** does the same, and works even while you're typing in a field. The bottom bar says **1-5 menu** instead of *1-4 screens*.
+- ⌨ **A number for every menu entry, Help included**: **1** Dashboard, **2** Settings, **3** Log, **4** History, **5** opens the Help menu, and **5** again closes it. The open menu's title stays lit while its list is showing. The bottom bar says **1-5 menu** instead of *1-4 screens*.
+- 🔤 **Ctrl + the underlined letter, by Javier's rule**: each entry gets the first letter of its name, unless another entry already has it; then the next letter of its name. Help is always H. So **Ctrl+D** Dashboard, **Ctrl+S** Settings (was Ctrl+E), **Ctrl+L** Log, **Ctrl+I** History (was Ctrl+Y: H is Help, so the next letter), **Ctrl+H** Help. They work even while you're typing in a field. On a plain text console Ctrl+I is the same key as Tab, so there **4** goes to History.
+- 📄 **About and License open as pages** in the window instead of windows on top; Help stays lit while they show, and **Esc** goes back to where you were.
 - 🧩 **A page of hypeForge Settings**: started with the hidden option `--hypeforge`, bitlaForge has no Quit of its own (Q and Ctrl+Q do nothing) and Settings closes it. If the miner is running, it **asks first** and then stops it, so the miner still never outlives bitlaForge. The option is left out of `--help` and the man page on purpose: it is for hypeForge, not for people.
 - 🔘 **Buttons say their key** (Javier, 3 October): **Start Mining (m)**, **Test Miner (t)**, **Save Changes (s)**, **Clear (c)**, **Stay (Esc)**. In the review before saving, **S** now presses Save.
 - 🛠 **A rare error at closing is gone**: the Dashboard's once-a-second refresh could fire while bitlaForge was closing and end the run with an error message. Found by the new tests.
 - 📚 The install-from-source steps now fetch forgekit from the Forge Suite repository, where it lives since 6 October.
 
-Tests: 64 → **81**; warnings 0 → 0. Dependency: `python-forgekit` ≥ 0.10.0. Nothing changes in your settings or history.
+Tests: 64 → **84**; warnings 0 → 0. Dependency: `python-forgekit` ≥ 0.10.0. Nothing changes in your settings or history.
 
 ### v1.0.0 — October 2, 2026
 

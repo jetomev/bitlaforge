@@ -3,11 +3,13 @@
 *The README carries the upcoming work and the two most recent releases; everything older lives here, newest-first.*
 
 ### v1.1.0 — October 8, 2026 — the same keys as every Forge app ([#13](https://github.com/jetomev/bitlaforge/issues/13))
-- [x] Menu keys from forgekit 0.10.0: **1-5** and **Ctrl + the underlined letter** for every menu entry, Help included (5 opens Help); the bottom bar says "1-5 menu"
+- [x] Menu keys from forgekit 0.10.0: **1-5** and **Ctrl + the underlined letter** for every menu entry, Help included (5 opens Help, 5 again closes it; the open menu lit); the bottom bar says "1-5 menu"
+- [x] Javier's letter rule: the first letter of the name, else its next free one; Help H. **Ctrl+S** Settings, **Ctrl+I** History
+- [x] About and License as pages in the window; Esc goes back
 - [x] `--hypeforge` (hidden): a page of hypeForge Settings with no Quit of its own; Settings closes it, and bitlaForge asks first when the miner is running or a change isn't saved
 - [x] Button labels in Javier's format, the key in brackets: **Start Mining (m)**, **Test Miner (t)**, **Save Changes (s)**, **Clear (c)**, **Stay (Esc)**
 - [x] A rare error at closing fixed (the Dashboard's refresh firing while bitlaForge closed)
-- [x] Tests 64 → 81, warnings 0
+- [x] Tests 64 → 84, warnings 0
 
 ### v1.0.0 — October 2, 2026 — rebuilt, and safe ([#4](https://github.com/jetomev/bitlaforge/issues/4))
 - [x] Rebuilt to match grubForge 2.0, from a screen-by-screen design Javier approved first

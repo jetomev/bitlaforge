@@ -1,12 +1,14 @@
 # bitlaForge v1.1.0 — Test Matrix
 
-Issue [#13](https://github.com/jetomev/bitlaforge/issues/13): the same keys as every Forge app (Javier, 8 Oct 2026), a page of hypeForge Settings (`--hypeforge`), and button labels as "Words in Title Case (k)" (Javier, 3 Oct 2026). Built on forgekit 0.10.0, which is not released yet: until it is, bitlaForge 1.1.0 runs **from the source folder**, on the forgekit in `~/Programs/forge-suite`.
+Issue [#13](https://github.com/jetomev/bitlaforge/issues/13): the same keys as every Forge app (Javier, 8 Oct 2026; round 2 from his second run the same evening: his letter rule, a menu's number closes it again, About and License as pages), a page of hypeForge Settings (`--hypeforge`), and button labels as "Words in Title Case (k)" (Javier, 3 Oct 2026). Built on forgekit 0.10.0, which is not released yet: until it is, bitlaForge 1.1.0 runs **from the source folder**, on the forgekit in `~/Programs/forge-suite`.
 
 ## 1 · Built and checked by Claude (8 Oct 2026)
 
-Automated: **81 tests** (64 before), all passing, 0 warnings (0 before); no miner left running afterwards. The 17 new ones are in `tests/test_v110.py`. Each fix was taken out once and its test seen to fail, then put back (17 checks):
+Automated: **84 tests** (64 before), all passing, 0 warnings (0 before); no miner left running afterwards. The 20 new ones are in `tests/test_v110.py`. Each fix was taken out once and its test seen to fail, then put back (17 checks, then 6 more in round 2):
 
 - every underlined letter is different, and bitlaForge binds no number or menu Ctrl key of its own (forgekit makes them);
+- the letters follow Javier's rule on the real app: Ctrl+D, Ctrl+S, Ctrl+L, Ctrl+I, Ctrl+H; the menu names none itself; Tab still moves between fields (in a terminal Ctrl+I and Tab are one key);
+- 5 opens Help with its title lit, 5 again closes it; About and License open as pages (no window on top), Help lit, Esc back to the page you came from;
 - 1-5 and Ctrl + letter reach every menu entry, Help included, Ctrl even from inside a field; the bottom bar says "1-5 menu";
 - with `--hypeforge`: no Quit in the bar, Q and Ctrl+Q do nothing; Settings closing it while mining **asks first**, asked twice still shows one question, and "Stop Mining and Quit" leaves no miner running; with nothing running it closes at once; with a change not saved it asks;
 - the option works as `--hypeforge` and `--hypeForge`, reaches the app, and is in neither `--help` nor the man page;
@@ -34,7 +36,11 @@ env PYTHONPATH=$HOME/Programs/forge-suite/forgekit python main.py
 | 2.1 | Start it (above) | The title says **bitlaForge 1.1.0**. The bottom bar says **M start / stop • T test • 1-5 menu • F1 help • ? all keys**. **Quit** is at the right of the menu bar | |
 | 2.2 | Press **2**, **3**, **4**, **1** | Settings, Log, History, Dashboard, in that order | |
 | 2.3 | Press **5** | The **Help** menu opens (Manual, Keys, License, About). **Esc** closes it | |
-| 2.4 | Press **Ctrl+E**, **Ctrl+L**, **Ctrl+Y**, **Ctrl+D**, then **Ctrl+H** | Settings, Log, History, Dashboard; then the Help menu. **Esc** | |
+| 2.4 | Press **Ctrl+S**, **Ctrl+L**, **Ctrl+I**, **Ctrl+D**, then **Ctrl+H** | Settings, Log, History, Dashboard; then the Help menu. **Esc**. The underlined letters in the menu bar are **D**ashboard, **S**ettings, **L**og, H**i**story, **H**elp | |
+| 2.4b | Press **5**, then **5** again | The Help menu opens with **Help** lit at the top; the second 5 closes it and Help is no longer lit | |
+| 2.4c | Press **3** (Log), then **5** and choose **About** | About shows **in the window** (no window on top), with Help lit. **Esc** goes back to the Log | |
+| 2.4d | Same with **5** ▸ **License** | The license shows as a page; **Esc** goes back to the Log | |
+| 2.4e | Press **2**, then **Tab** a few times | Tab moves between the fields; it never jumps to History | |
 | 2.5 | Press **2**, then **Tab** until you are in **Worker name** (the third field), type **12** at the end | The 12 is typed into the field; the screen doesn't change | |
 | 2.6 | Still in the field, press **Ctrl+L** | The Log opens (Ctrl works from inside a field) | |
 | 2.7 | Look at the bar above the bottom one | **1 change not saved yet**, with **Save Changes (s)** and **Discard Changes**. Click **Discard Changes** | |
@@ -42,7 +48,7 @@ env PYTHONPATH=$HOME/Programs/forge-suite/forgekit python main.py
 | 2.9 | Dashboard buttons | **Start Mining (m)** and **Test Miner (t)**, nothing cut off | |
 | 2.10 | Log buttons (press **3**) | **Copy the Log** and **Clear (c)** | |
 | 2.11 | Press **2**, pick the **Safety** group (↓ twice), change **Pause at** to another value, press **F10** | The review shows the change, with **Save (s)** and **Cancel (Esc)**. Press **Esc**, then **Discard Changes** | |
-| 2.12 | Press **?** | The keys list: **1-5, Ctrl+letter** go to a menu entry, Help included; the Quit line says it's not there inside hypeForge Settings. **Esc** | |
+| 2.12 | Press **?** | The keys list: **1-5, Ctrl+letter** go to a menu entry, Help included, naming Ctrl+D, Ctrl+S, Ctrl+L, Ctrl+I, Ctrl+H; the Quit line says it's not there inside hypeForge Settings. **Esc** | |
 | 2.13 | Press **Q** (nothing running, nothing changed) | bitlaForge closes at once; the closing note prints | |
 | 2.14 | `env PYTHONPATH=$HOME/Programs/forge-suite/forgekit python main.py --version`, then the same with `--help` | **bitlaForge 1.1.0**; the help text says **1-5** and has **no** "hypeforge" in it | |
 
@@ -63,7 +69,7 @@ env PYTHONPATH=$HOME/Programs/forge-suite/forgekit python main.py --hypeforge
 | 2.21 | Send the same command once more, and choose **Stop Mining and Quit** | bitlaForge closes; the closing note says **The miner is stopped** | |
 | 2.22 | In the second terminal: `ps -C minerd` | Only the heading line: no miner left | |
 | 2.23 | Start it with `--hypeforge` again (not mining), and send the same command | bitlaForge closes at once, no question | |
-| 2.24 *(optional)* | On a text console (Ctrl+Alt+F3, log in, `cd ~/Programs/bitlaforge`, start it as in 2.1) | Everything readable; buttons show their keys; Ctrl+Alt+F1/F2 to come back | |
+| 2.24 *(optional)* | On a text console (Ctrl+Alt+F3, log in, `cd ~/Programs/bitlaforge`, start it as in 2.1) | Everything readable; buttons show their keys. **Ctrl+I** acts as Tab there (expected: the console can't tell them apart); **4** goes to History. Ctrl+Alt+F1/F2 to come back | |
 
 Then put your settings back only if something changed them:
 
