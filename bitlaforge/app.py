@@ -10,7 +10,8 @@ closing bitlaForge always stops the miner, after asking.
 underlined letter and 1-5 for every menu entry, Help included). The letters follow
 Javier's rule (forgekit picks them: the title's first letter, else its next free one;
 Help H, Quit Q), so MENU names none: Ctrl+D, S, L, I (History: H is Help). About and
-License open as pages, not windows (forgekit). ``--hypeforge`` makes
+License, the Keys list and the manual open as pages, not windows (forgekit).
+``--hypeforge`` makes
 bitlaForge a page of hypeForge Settings (no Quit of its own); button labels read
 "Words in Title Case (k)", the key that presses them in brackets.
 """
@@ -31,7 +32,7 @@ from textual.css.query import NoMatches
 from textual.widgets import Button, Static
 
 from forgekit import (
-    FORGE_CSS, GPL3_NOTICE, MENU_HINT, ChangeGroup, ForgeApp, ForgeModal, ManualScreen, Notice, ReviewDialog,
+    FORGE_CSS, GPL3_NOTICE, MENU_HINT, ChangeGroup, ForgeApp, ForgeModal, Notice, ReviewDialog,
     SettingRow, load_pages,
 )
 
@@ -267,7 +268,8 @@ class BitlaForgeApp(ForgeApp):
         if not pages:
             self.notify("The manual isn't there.", severity="warning")
             return
-        self.push_screen(ManualScreen("bitlaForge manual", pages, start=page))
+        # 1.1.0 (Javier, 8 Oct): a page in the window, not a window over it; Esc goes back
+        self.show_manual("bitlaForge manual", pages, start=page)
 
     def action_field_help(self) -> None:
         w = self.focused

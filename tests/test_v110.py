@@ -1,6 +1,7 @@
 """bitlaForge 1.1.0 (#13, Javier 8 Oct 2026): the menu keys come from forgekit 0.10.0
 (1-5 and Ctrl + the underlined letter, Help included; the letters by Javier's rule:
-Ctrl+D, S, L, I, H), About and License open as pages, the bottom bar says "1-5 menu",
+Ctrl+D, S, L, I, H), About, License, Keys and the manual open as pages, the bottom bar
+says "1-5 menu",
 --hypeforge makes bitlaForge a page of hypeForge Settings (no Quit of its own; Settings
 asks it to close), and buttons read "Words in Title Case (k)".
 
@@ -176,6 +177,58 @@ class HelpMenuAndPages(Base):
             about = str(app.query_one("#sec-forge-about").render()) + " ".join(
                 str(w.render()) for w in app.query_one("#sec-forge-about").query("*"))
             self.assertIn("bitlaForge", about)
+
+
+class ManualAndKeysAsPages(Base):
+    """Javier, 8 Oct 2026 ("yes, Keys and Manual as pages too"): the manual and the Keys list
+    open in the window like About and License, Help lit; Esc goes back where you were."""
+
+    def lit(self, app, entry: str) -> bool:
+        return app.screen_stack[0].query_one(f"#menu-{entry}").has_class("active")
+
+    async def page_shown(self, app, pilot, page: str, came_from: str) -> None:
+        await pilot.pause(0.5)
+        self.assertEqual(len(app.screen_stack), 1, f"{page}: no window over the app")
+        self.assertEqual(app.query_one("#forge-work").current, f"sec-{page}")
+        self.assertTrue(self.lit(app, "help"), f"{page}: Help lit")
+        await pilot.press("escape")
+        await pilot.pause(0.4)
+        self.assertEqual(app.query_one("#forge-work").current, f"sec-{came_from}", f"{page}: Esc goes back")
+        self.assertTrue(self.lit(app, came_from))
+
+    async def test_f1_opens_the_manual_page_for_what_is_selected(self):
+        app = self.app()
+        async with app.run_test(size=(100, 30)) as pilot:
+            await pilot.pause(0.5)
+            await pilot.press("2")
+            await pilot.pause(0.3)
+            app.query_one("#row-wallet").control.focus()         # a setting in the Pool & wallet group
+            await pilot.pause(0.2)
+            self.assertEqual(app.focused.setting_key, "wallet")
+            await pilot.press("f1")
+            await pilot.pause(0.5)
+            self.assertEqual(app.query_one("#sec-forge-manual").current, "pool", "its own page")
+            await self.page_shown(app, pilot, "forge-manual", "settings")
+            await pilot.press("3")
+            await pilot.pause(0.3)
+            await pilot.press("f1")
+            await pilot.pause(0.5)
+            self.assertEqual(app.query_one("#sec-forge-manual").current, "log", "the same page, now at the Log's")
+            await self.page_shown(app, pilot, "forge-manual", "log")
+
+    async def test_help_manual_and_keys_are_pages(self):
+        from forgekit import load_pages
+        from bitlaforge.app import MANUAL_DIR
+        app = self.app()
+        async with app.run_test(size=(100, 30)) as pilot:
+            await pilot.pause(0.5)
+            await pilot.press("5", "m")                             # Help ▸ Manual
+            await pilot.pause(0.5)
+            self.assertEqual(app.query_one("#sec-forge-manual").current, load_pages(MANUAL_DIR)[0][0])
+            await self.page_shown(app, pilot, "forge-manual", "dashboard")
+            await pilot.press("question_mark")                      # the Keys list
+            await self.page_shown(app, pilot, "forge-keys", "dashboard")
+            self.assertFalse(app.miner.running, "no key here started the miner")
 
 
 class InsideHypeForgeSettings(Base):

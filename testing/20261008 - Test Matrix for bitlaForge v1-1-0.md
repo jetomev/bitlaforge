@@ -4,11 +4,12 @@ Issue [#13](https://github.com/jetomev/bitlaforge/issues/13): the same keys as e
 
 ## 1 · Built and checked by Claude (8 Oct 2026)
 
-Automated: **84 tests** (64 before), all passing, 0 warnings (0 before); no miner left running afterwards. The 20 new ones are in `tests/test_v110.py`. Each fix was taken out once and its test seen to fail, then put back (17 checks, then 6 more in round 2):
+Automated: **86 tests** (64 before), all passing, 0 warnings (0 before); no miner left running afterwards. The 22 new ones are in `tests/test_v110.py`. Each fix was taken out once and its test seen to fail, then put back (17 checks, 6 more in round 2, 2 more in round 3):
 
 - every underlined letter is different, and bitlaForge binds no number or menu Ctrl key of its own (forgekit makes them);
 - the letters follow Javier's rule on the real app: Ctrl+D, Ctrl+S, Ctrl+L, Ctrl+I, Ctrl+H; the menu names none itself; Tab still moves between fields (in a terminal Ctrl+I and Tab are one key);
 - 5 opens Help with its title lit, 5 again closes it; About and License open as pages (no window on top), Help lit, Esc back to the page you came from;
+- the manual (Help ▸ Manual, F1) and the Keys list (?) open as pages too; F1 opens the page for what is selected (Wallet → Pool & wallet, the Log → Log); Esc back;
 - 1-5 and Ctrl + letter reach every menu entry, Help included, Ctrl even from inside a field; the bottom bar says "1-5 menu";
 - with `--hypeforge`: no Quit in the bar, Q and Ctrl+Q do nothing; Settings closing it while mining **asks first**, asked twice still shows one question, and "Stop Mining and Quit" leaves no miner running; with nothing running it closes at once; with a change not saved it asks;
 - the option works as `--hypeforge` and `--hypeForge`, reaches the app, and is in neither `--help` nor the man page;
@@ -40,6 +41,7 @@ env PYTHONPATH=$HOME/Programs/forge-suite/forgekit python main.py
 | 2.4b | Press **5**, then **5** again | The Help menu opens with **Help** lit at the top; the second 5 closes it and Help is no longer lit | |
 | 2.4c | Press **3** (Log), then **5** and choose **About** | About shows **in the window** (no window on top), with Help lit. **Esc** goes back to the Log | |
 | 2.4d | Same with **5** ▸ **License** | The license shows as a page; **Esc** goes back to the Log | |
+| 2.4f | Press **2**, Tab into **Wallet**, press **F1**; then **Esc**. Then **5** ▸ **Manual**, open another page, **Backspace**, **Esc** | The manual shows **in the window** at *Pool & wallet*, Help lit; Esc goes back to Settings. From Help: Backspace goes back to the previous manual page, Esc to where you were | |
 | 2.4e | Press **2**, then **Tab** a few times | Tab moves between the fields; it never jumps to History | |
 | 2.5 | Press **2**, then **Tab** until you are in **Worker name** (the third field), type **12** at the end | The 12 is typed into the field; the screen doesn't change | |
 | 2.6 | Still in the field, press **Ctrl+L** | The Log opens (Ctrl works from inside a field) | |
@@ -48,7 +50,7 @@ env PYTHONPATH=$HOME/Programs/forge-suite/forgekit python main.py
 | 2.9 | Dashboard buttons | **Start Mining (m)** and **Test Miner (t)**, nothing cut off | |
 | 2.10 | Log buttons (press **3**) | **Copy the Log** and **Clear (c)** | |
 | 2.11 | Press **2**, pick the **Safety** group (↓ twice), change **Pause at** to another value, press **F10** | The review shows the change, with **Save (s)** and **Cancel (Esc)**. Press **Esc**, then **Discard Changes** | |
-| 2.12 | Press **?** | The keys list: **1-5, Ctrl+letter** go to a menu entry, Help included, naming Ctrl+D, Ctrl+S, Ctrl+L, Ctrl+I, Ctrl+H; the Quit line says it's not there inside hypeForge Settings. **Esc** | |
+| 2.12 | Press **?** | The keys list opens as a page (Help lit, Esc back): **1-5, Ctrl+letter** go to a menu entry, Help included, naming Ctrl+D, Ctrl+S, Ctrl+L, Ctrl+I, Ctrl+H; the Quit line says it's not there inside hypeForge Settings. **Esc** | |
 | 2.13 | Press **Q** (nothing running, nothing changed) | bitlaForge closes at once; the closing note prints | |
 | 2.14 | `env PYTHONPATH=$HOME/Programs/forge-suite/forgekit python main.py --version`, then the same with `--help` | **bitlaForge 1.1.0**; the help text says **1-5** and has **no** "hypeforge" in it | |
 
