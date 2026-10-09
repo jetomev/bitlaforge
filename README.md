@@ -2,6 +2,8 @@
 
 > Solo Bitcoin mining, honestly framed: start and stop the miner, watch it work, and see your real chance of finding a block. It never starts mining on its own, and it stops the miner when it closes.
 
+> 🖥 **Where it runs:** **any Linux distribution** (it needs `minerd`) · **no desktop needed** · **works on a plain text console** (a tty).
+
 ![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)
 ![Platform: Linux](https://img.shields.io/badge/Platform-Linux-lightgrey.svg)
 ![Python: 3.11+](https://img.shields.io/badge/Python-3.11+-green.svg)

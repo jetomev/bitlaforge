@@ -25,6 +25,9 @@
 - [x] **Next version — button labels in Javier's format (3 Oct 2026):** "Words In Title Case (k)", e.g. "Review Updates (u)": the key in brackets after the words, for every Forge Suite app. Done in 1.1.0 (#13): Start Mining (m), Stop Mining (m), Test Miner (t), Add Your Wallet, Restore the Newest Backup, How to Install the Miner, Copy the Log, Clear (c), Save Changes (s), Discard Changes, Save (s), Stop Mining and Quit, Save First, Quit Without Saving, Stay (Esc).
 
 - [x] **Checked (3 Oct): bitlaForge's Log on a text console is fine.** nogForge crashed on console colour names (`ansi_bright_green`) passed to Rich; bitlaForge's Log passes the same names but Textual's RichLog reads them: no crash (headless), and the 2 Oct console preview of the Log listed bright green among the colours drawn.
+## At the next release
+- [ ] **The AUR description, at the next release** (Javier, 2026-10-09): the AUR `pkgdesc` (and `.SRCINFO`) gets the same "where it runs" words as the README, GitHub About and kognogos.org — distribution · desktop · plain text console. Not pushed on its own: AUR pushes stay one per proven version.
+
 ## Next — the grubForge 2.0 look (Javier, 2026-10-02)
 After alacrittyForge. Rework bitlaForge onto forgekit 0.5.0 to match grubForge 2.0 ("so far the best of the 3"), with the same method: research, a screen-by-screen design Javier approves before code, build, tests (incl. 100 columns), his own run, release. Fold in the open items below (F-1 #3, #2 console) and the v0.3.0 dashboard ideas.
 
