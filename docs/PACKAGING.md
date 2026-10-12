@@ -15,6 +15,7 @@ aren't listed.*
 | python-rich | the dashboard | rich |
 | python-tomlkit | its settings file | tomlkit |
 | python-forgekit (>= 0.10.0) | the Forge look | forgekit |
+| util-linux | `setpriv --pdeathsig`: the system stops the miner if bitlaForge dies (a base package, named anyway) | (program setpriv) |
 
 ## Optional (`optdepends`)
 
@@ -24,4 +25,4 @@ aren't listed.*
 
 ## The AUR recipe
 
-Matches the AUR recipe 1.1.0-1 (its `util-linux` is a base package: harmless). Nothing to change.
+Matches the AUR recipe 1.1.0-1. Nothing to change.

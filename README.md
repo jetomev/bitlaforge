@@ -71,6 +71,8 @@ Built on [forgekit](https://github.com/jetomev/forge-suite/tree/main/forgekit), 
 
 ## Requirements
 
+**Everything it needs** to build, run and test, with why, is in [docs/PACKAGING.md](docs/PACKAGING.md), measured from the code (the Forge Suite's [dependency audit](https://github.com/jetomev/forge-suite/issues/91), 2026-10-11).
+
 - Linux, Python 3.11 or newer
 - `python-textual`, `python-rich`, `python-tomlkit` and [`python-forgekit`](https://github.com/jetomev/forge-suite/tree/main/forgekit) 0.10.0 or newer
 - `util-linux` (for `setpriv`, already on every distribution)
