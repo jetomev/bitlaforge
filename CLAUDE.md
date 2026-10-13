@@ -35,7 +35,6 @@ A [forgekit](https://github.com/jetomev/forge-suite/tree/main/forgekit) (Python/
 - The README stays accurate top to bottom. Roadmap and changelog newest first; the README keeps upcoming work and the two newest releases, older ones live in `docs/ROADMAP.md` / `docs/CHANGELOG.md`.
 - Findings are numbered F-n and each gets an issue, opened with a full explanation and closed with one.
 - After every push: a Vault entry in `~/Google Drive/Rullynastre/BitlaForge/`.
-- Plain words throughout. The readers are not engineers.
 
 ## Release discipline
 - Version in **every** surface at once: `bitlaforge/__init__.py`, README badge, `bitlaforge.1` `.TH`, the AUR `PKGBUILD` + `.SRCINFO` in `~/Programs/aur-bitlaforge` (content in lockstep, not only `pkgver`).
