@@ -25,6 +25,9 @@
 - [x] **Next version — button labels in Javier's format (3 Oct 2026):** "Words In Title Case (k)", e.g. "Review Updates (u)": the key in brackets after the words, for every Forge Suite app. Done in 1.1.0 (#13): Start Mining (m), Stop Mining (m), Test Miner (t), Add Your Wallet, Restore the Newest Backup, How to Install the Miner, Copy the Log, Clear (c), Save Changes (s), Discard Changes, Save (s), Stop Mining and Quit, Save First, Quit Without Saving, Stay (Esc).
 
 - [x] **Checked (3 Oct): bitlaForge's Log on a text console is fine.** nogForge crashed on console colour names (`ansi_bright_green`) passed to Rich; bitlaForge's Log passes the same names but Textual's RichLog reads them: no crash (headless), and the 2 Oct console preview of the Log listed bright green among the colours drawn.
+## 2026-10-12 · CLAUDE.md keeps only this project's own rules
+- [x] **One rule, one level** (Javier, 2026-10-12): the repeated 'plain words' rule removed; the global agreement carries it. Commit pushed the same night.
+
 ## 2026-10-11 · What it needs, measured
 - [x] **What it needs, measured** (2026-10-11, forge-suite#91): `docs/PACKAGING.md` + `tests/test_needs.py`; the AUR recipe 1.1.0-1 builds clean in a clean Arch system and matches the code
 
