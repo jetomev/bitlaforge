@@ -42,7 +42,7 @@ After alacrittyForge. Rework bitlaForge onto forgekit 0.5.0 to match grubForge 2
 
 ## Now
 - [x] Project kit completed: `CLAUDE.md` and this `TODO.md` (Javier, 2026-10-01: mandatory for every project). GitHub (README, About, topics, releases) and the AUR were already complete; the Vault folder exists
-- [ ] **F-1 · bitlaforge#3** · Esc does not take the cursor out of a Config field, so the next shortcut key is typed into it (found 2026-10-01 in forgekit's console-mode test; same in a normal terminal). Also: `E` focuses Pool URL while the Shortcuts window says "first field"
+- [x] **F-1 · bitlaforge#3** · Esc does not take the cursor out of a Config field, so the next shortcut key is typed into it (found 2026-10-01 in forgekit's console-mode test; same in a normal terminal). Also: `E` focuses Pool URL while the Shortcuts window says "first field" — **done**: fixed in v1.0.0 (`3a9dc33`), #3 closed (ticked 2026-10-22 by the KognogOS link check)
 - [ ] **bitlaforge#2 · console mode, the app's own part** (forgekit 0.4.1 already gives the shell console mode; bitlaForge runs on it unchanged and passed the console test):
   - drop bitlaForge's own copy of the form colours (`Input` / `Select` / `#log-view-container` in `app.py`), which duplicates forgekit since 0.3.0 (**K-1**: on a terminal that draws bright backgrounds, those frames vanish; not on a real console)
   - move the remaining fixed hex colours to the `$forge-*` roles, and the nav marks (`⚡`, `○`…) to `glyph()`
