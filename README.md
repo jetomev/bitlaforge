@@ -1,3 +1,6 @@
+> ## 📦 bitlaForge has moved into the [Forge Suite](https://github.com/jetomev/forge-suite/tree/main/bitlaforge)
+> Since **22 October 2026** bitlaForge lives in **[jetomev/forge-suite](https://github.com/jetomev/forge-suite)**, with its full history. New releases are tagged `bitlaforge-vX.Y.Z` there, and issues go there too (the open ones moved: #9 → [forge-suite#115](https://github.com/jetomev/forge-suite/issues/115), #10 → [#116](https://github.com/jetomev/forge-suite/issues/116), #11 → [#117](https://github.com/jetomev/forge-suite/issues/117), #12 → [#118](https://github.com/jetomev/forge-suite/issues/118)). This repository is archived: its releases (up to 1.1.0) and issues stay readable, and the AUR package `bitlaforge` keeps working.
+
 # ⚡ bitlaForge
 
 > Solo Bitcoin mining, honestly framed: start and stop the miner, watch it work, and see your real chance of finding a block. It never starts mining on its own, and it stops the miner when it closes.
