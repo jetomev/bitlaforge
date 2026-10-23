@@ -35,6 +35,7 @@
 - [x] **What it needs, measured** (2026-10-11, forge-suite#91): `docs/PACKAGING.md` + `tests/test_needs.py`; the AUR recipe 1.1.0-1 builds clean in a clean Arch system and matches the code
 
 ## At the next release
+- [ ] **The launcher entry (#12)** — `bitlaforge.desktop` + `tests/test_desktop_entry.py` are in the repo (2026-10-22, the KognogOS clean-house); at the next version the AUR recipe adds `install -Dm644 bitlaforge.desktop "${pkgdir}/usr/share/applications/bitlaforge.desktop"`, `checkdepends=('desktop-file-utils')` and `desktop-file-validate bitlaforge.desktop` in `check()`; then close #12, and hypeForge's own copy can go
 - [ ] **The AUR description, at the next release** (Javier, 2026-10-09): the AUR `pkgdesc` (and `.SRCINFO`) gets the same "where it runs" words as the README, GitHub About and kognogos.org — distribution · desktop · plain text console. Not pushed on its own: AUR pushes stay one per proven version.
 
 ## Next — the grubForge 2.0 look (Javier, 2026-10-02)

@@ -23,6 +23,12 @@ aren't listed.*
 |---|---|---|
 | cpuminer | the miner it runs (minerd) | (program minerd) |
 
+## At build time only (`checkdepends`)
+
+| Package | What uses it | Module / program |
+|---|---|---|
+| desktop-file-utils | `check()` validates the launcher entry `bitlaforge.desktop` (next release, #12) | (program desktop-file-validate) |
+
 ## The AUR recipe
 
 Matches the AUR recipe 1.1.0-1. Nothing to change.

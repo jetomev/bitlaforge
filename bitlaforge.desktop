@@ -1,0 +1,15 @@
+[Desktop Entry]
+# bitlaForge's own launcher entry (#12): the package installs it as /usr/share/applications/bitlaforge.desktop,
+# so the app shows in every app menu and launcher. Terminal=true: the desktop opens it in its terminal.
+# hypeForge ships its own copy for its floating window; a user copy of the same name replaces this one,
+# so nothing shows twice.
+Type=Application
+Name=bitlaForge
+GenericName=Solo Bitcoin mining
+Comment=Solo Bitcoin mining, honestly framed: the real odds, and the miner never outlives the app
+TryExec=bitlaforge
+Exec=bitlaforge
+Icon=utilities-system-monitor
+Terminal=true
+Categories=System;Monitor;
+Keywords=bitcoin;mining;solo;miner;pool;
